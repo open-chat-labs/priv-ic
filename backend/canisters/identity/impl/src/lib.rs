@@ -1,3 +1,4 @@
+use crate::model::identity_map::IdentityMap;
 use candid::Principal;
 use std::cell::RefCell;
 use std::collections::HashSet;
@@ -7,6 +8,8 @@ mod lifecycle;
 mod model;
 mod queries;
 mod updates;
+
+pub const CONFIRMATION_CODE_EXPIRY_MILLIS: u64 = 60 * 60 * 1000; // 1 hour
 
 thread_local! {
     pub static RUNTIME_STATE: RefCell<Option<RuntimeState>> = RefCell::default();
@@ -25,6 +28,7 @@ impl RuntimeState {
 
 pub struct Data {
     pub verification_code_sender_principals: HashSet<Principal>,
+    pub identities: IdentityMap,
 }
 
 impl Data {
@@ -33,6 +37,7 @@ impl Data {
             verification_code_sender_principals: verification_code_sender_principals
                 .into_iter()
                 .collect(),
+            identities: IdentityMap::default(),
         }
     }
 }
