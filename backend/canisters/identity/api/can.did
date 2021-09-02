@@ -149,7 +149,12 @@ type RemoveVerificationCodesResponse =
         NotAuthorized;
     };
 
-service: {
+type InitArgs = 
+    record {
+        verification_code_sender_principals: vec principal;
+    };
+
+service: (InitArgs) -> {
     // Your full profile as seen when on the identity app directly
     profile: (ProfileArgs) -> (ProfileResponse) query;
 
