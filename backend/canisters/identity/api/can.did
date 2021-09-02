@@ -1,5 +1,29 @@
 import "../../../libraries/types/can.did";
 
+type ProfileArgs =
+    record {
+    };
+
+type ProfileResponse =
+    variant {
+    };
+
+type ProfileViewArgs =
+    record {
+    };
+
+type ProfileViewResponse =
+    variant {
+    };
+
+type ManageAccessArgs =
+    record {
+    };
+
+type ManageAccessResponse =
+    variant {
+    };
+
 type AddPhoneNumberArgs =
     record {
     };
@@ -24,9 +48,67 @@ type ConfirmPhoneNumberResponse =
     variant {
     };
 
+type AddEmailArgs =
+    record {
+    };
+
+type AddEmailResponse =
+    variant {
+    };
+
+type SendEmailVerificationCodeArgs =
+    record {
+    };
+
+type SendEmailVerificationCodeResponse =
+    variant {
+    };
+
+type ConfirmEmailArgs =
+    record {
+    };
+
+type ConfirmEmailResponse =
+    variant {
+    };
+
+type VerificationCodesArgs =
+    record {
+    };
+
+type VerificationCodesResponse =
+    variant {
+    };
+
+type RemoveVerificationCodesArgs =
+    record {
+    };
+
+type RemoveVerificationCodesResponse =
+    variant {
+    };
+
 service: {
+    // Your full profile as seen when on the identity app directly
+    profile: (ProfileArgs) -> (ProfileResponse) query;
+
+    // Your profile as seen by a specific app
+    profile_view: (ProfileViewArgs) -> (ProfileViewResponse) query;
+
+    // Grant / revoke an app's access to multiple fields
+    manage_access: (ManageAccessArgs) -> (ManageAccessResponse);
+
     // Phone number
     add_phone_number: (AddPhoneNumberArgs) -> (AddPhoneNumberResponse);
     send_phone_number_verification_code: (SendPhoneNumberVerificationCodeArgs) -> (SendPhoneNumberVerificationCodeResponse);
     confirm_phone_number: (ConfirmPhoneNumberArgs) -> (ConfirmPhoneNumberResponse);
+
+    // Email
+    add_email: (AddEmailArgs) -> (AddEmailResponse);
+    send_email_verification_code: (SendEmailVerificationCodeArgs) -> (SendEmailVerificationCodeResponse);
+    confirm_email: (ConfirmEmailArgs) -> (ConfirmEmailResponse);
+
+    //// Verification code sender
+    verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse);
+    remove_verification_codes: (RemoveVerificationCodesArgs) -> (RemoveVerificationCodesResponse);
 }
