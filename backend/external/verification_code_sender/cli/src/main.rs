@@ -17,7 +17,7 @@ async fn main() -> Result<(), Error> {
     env_logger::init();
     let args: Vec<String> = std::env::args().collect();
     let command: &str = &args[1];
-    let index = args.get(2).map_or(None, |i| i.parse::<u64>().ok());
+    let index = args.get(2).and_then(|i| i.parse::<u64>().ok());
     let canister_id = Principal::from_text(dotenv::var("IDENTITY_CANISTER_ID")?)?;
     let ic_url = dotenv::var("IC_URL")?;
     let ic_identity_pem = dotenv::var("IC_IDENTITY_PEM")?;
