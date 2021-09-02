@@ -3,6 +3,10 @@
 version = 3
 
 [[package]]
+name = "identity_canister"
+version = "0.1.0"
+
+[[package]]
 name = "identity_canister_api"
 version = "0.1.0"
 
