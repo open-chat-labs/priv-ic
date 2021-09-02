@@ -20,18 +20,18 @@ impl DummyIndexStore {
 impl IndexStore for DummyIndexStore {
     async fn get_index_processed_up_to(&self) -> Result<Option<u64>, Error> {
         match self.index_processed_up_to.lock() {
-            Ok(m) => Ok(*m),
-            Err(e) => Err(e.to_string().into()),
+            Ok(mutex) => Ok(*mutex),
+            Err(error) => Err(error.to_string().into()),
         }
     }
 
     async fn set_index_processed_up_to(&self, index: u64) -> Result<(), Error> {
         match self.index_processed_up_to.lock() {
-            Ok(mut m) => {
-                *m.deref_mut() = Some(index);
+            Ok(mut mutex) => {
+                *mutex.deref_mut() = Some(index);
                 Ok(())
             }
-            Err(e) => Err(e.to_string().into()),
+            Err(error) => Err(error.to_string().into()),
         }
     }
 }

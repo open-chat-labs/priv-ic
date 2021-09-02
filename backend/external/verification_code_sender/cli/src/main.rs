@@ -1,5 +1,10 @@
-pub mod dummy_index_store;
+mod dummy_email_sender;
+mod dummy_index_store;
+mod dummy_sms_sender;
 
+use crate::dummy_email_sender::DummyEmailSender;
+use crate::dummy_index_store::DummyIndexStore;
+use crate::dummy_sms_sender::DummySmsSender;
 use candid::Principal;
 use std::str::FromStr;
 use types::Error;
@@ -24,12 +29,16 @@ async fn main() -> Result<(), Error> {
         fetch_root_key: !is_production,
     };
     let ic_agent = IcAgent::build(&ic_agent_config, canister_id).await?;
-    let index_store = crate::dummy_index_store::DummyIndexStore::new(index);
+    let index_store = DummyIndexStore::new(index);
+    let sms_sender = DummySmsSender::new();
+    let email_sender = DummyEmailSender::new();
 
     match command {
-        "send" => actions::send_codes::run(&ic_agent, &index_store).await,
+        "send" => {
+            actions::send_codes::run(&ic_agent, &index_store, &sms_sender, &email_sender).await
+        }
         "remove" => actions::remove_codes::run(&ic_agent, &index_store).await,
-        "auto" => runner::run(&ic_agent, &index_store).await,
+        "auto" => runner::run(&ic_agent, &index_store, &sms_sender, &email_sender).await,
         _ => Err(format!("Unsupported command: {}", command).into()),
     }
 }
