@@ -6,70 +6,120 @@ type ProfileArgs =
 
 type ProfileResponse =
     variant {
+        Success: ProfileSuccessResult;
+        NotFound;
     };
 
-type ProfileViewArgs =
+type ProfileSuccessResult =
+    record {
+        identity: Identity;
+        apps: vec App;
+    };
+
+type VisibleProfileFieldsArgs =
+    record {
+        app_domain_name: text;
+    };
+
+type VisibleProfileFieldsResponse =
+    variant {
+        Success: VisibleProfileFieldsSuccessResult;
+        NotFound;
+    };
+
+type VisibleProfileFieldsSuccessResult =
+    record {
+        fields: vec FieldId;
+    };
+
+type AppProfileViewArgs =
     record {
     };
 
-type ProfileViewResponse =
+type AppProfileViewResponse =
     variant {
+        Success: AppProfileViewSuccessResult;
+        NotFound;
     };
 
-type ManageAccessArgs =
+type AppProfileViewSuccessResult =
     record {
+        email: AppEmailFacet;
+        phone: AppPhoneFacet;
     };
 
-type ManageAccessResponse =
-    variant {
-    };
-
-type AddPhoneNumberArgs =
+type SetVisibleProfileFieldsArgs =
     record {
+        app_domain_name: text;
+        fields: vec FieldId;
     };
 
-type AddPhoneNumberResponse =
+type SetVisibleProfileFieldsResponse =
     variant {
     };
 
-type SendPhoneNumberVerificationCodeArgs =
+type RegisterPhoneNumberArgs =
     record {
+        phone_number: PhoneNumber;        
     };
 
-type SendPhoneNumberVerificationCodeResponse =
+type RegisterPhoneNumberResponse =
     variant {
+        Success: RegisterPhoneNumberSuccessResult;
+        AlreadyRegistered;
+        AlreadyRegisteredByOther;
+        InvalidPhoneNumber;
     };
 
-type ConfirmPhoneNumberArgs =
+type RegisterPhoneNumberSuccessResult
     record {
+        field_id: FieldId;
     };
 
-type ConfirmPhoneNumberResponse =
-    variant {
-    };
-
-type AddEmailArgs =
+type RegisterEmailArgs =
     record {
+        email_address: text;
     };
 
-type AddEmailResponse =
+type RegisterEmailResponse =
     variant {
+        Success: RegisterEmailAddressSuccessResult;
+        AlreadyRegistered;
+        AlreadyRegisteredByOther;
+        InvalidEmailAddress;
     };
 
-type SendEmailVerificationCodeArgs =
+type RegisterEmailAddressSuccessResult
     record {
+        field_id: FieldId;
     };
 
-type SendEmailVerificationCodeResponse =
-    variant {
-    };
-
-type ConfirmEmailArgs =
+type SendVerificationCodeArgs =
     record {
+        field_id: FieldId;
     };
 
-type ConfirmEmailResponse =
+type SendVerificationCodeResponse =
     variant {
+        Success;
+        AlreadySent;
+        NotFound;
+    };
+
+type ConfirmVerificationCodeArgs =
+    record {
+        field_id: FieldId;
+        verification_code: text;
+    };
+
+type ConfirmVerificationCodeResponse =
+    variant {
+        Success;
+        ConfirmationCodeIncorrect;
+        ConfirmationCodeExpired;
+        AlreadyConfirmed;
+        NotSent;
+        NotFound;
     };
 
 type VerificationCodesArgs =
@@ -92,23 +142,22 @@ service: {
     // Your full profile as seen when on the identity app directly
     profile: (ProfileArgs) -> (ProfileResponse) query;
 
-    // Your profile as seen by a specific app
-    profile_view: (ProfileViewArgs) -> (ProfileViewResponse) query;
+    // A view of the profile for the given app
+    visible_profile_fields: (VisibleProfileFieldsArgs) -> (VisibleProfileFieldsResponse) query;
 
-    // Grant / revoke an app's access to multiple fields
-    manage_access: (ManageAccessArgs) -> (ManageAccessResponse);
+    // Called by an app to get the view of the profile visible to the app
+    app_profile_view: (AppProfileViewArgs) -> (AppProfileViewResponse) query;
 
-    // Phone number
-    add_phone_number: (AddPhoneNumberArgs) -> (AddPhoneNumberResponse);
-    send_phone_number_verification_code: (SendPhoneNumberVerificationCodeArgs) -> (SendPhoneNumberVerificationCodeResponse);
-    confirm_phone_number: (ConfirmPhoneNumberArgs) -> (ConfirmPhoneNumberResponse);
+    // Set the list of fields to which you grant the given app access
+    set_visible_profile_fields: (SetVisibleProfileFieldsArgs) -> (SetVisibleProfileFieldsResponse);
 
-    // Email
-    add_email: (AddEmailArgs) -> (AddEmailResponse);
-    send_email_verification_code: (SendEmailVerificationCodeArgs) -> (SendEmailVerificationCodeResponse);
-    confirm_email: (ConfirmEmailArgs) -> (ConfirmEmailResponse);
+    register_phone_number: (RegisterPhoneNumberArgs) -> (RegisterPhoneNumberResponse);
+    register_email: (RegisterEmailArgs) -> (RegisterEmailResponse);
+
+    send_verification_code: (SendVerificationCodeArgs) -> (SendVerificationCodeResponse);
+    confirm_verification_code: (ConfirmVerificationCodeArgs) -> (ConfirmVerificationCodeResponse);
 
     //// Verification code sender
-    verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse);
-    remove_verification_codes: (RemoveVerificationCodesArgs) -> (RemoveVerificationCodesResponse);
+    ext_verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse);
+    ext_remove_verification_codes: (RemoveVerificationCodesArgs) -> (RemoveVerificationCodesResponse);
 }

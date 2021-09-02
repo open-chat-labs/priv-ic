@@ -1,0 +1,86 @@
+type FieldId = nat;
+
+type App =
+    record {
+        domain_name: text;
+    };
+
+type PhoneNumber = 
+    record {
+        country_code: nat16;
+        number: text;
+    };
+
+type Identity = 
+    record {
+        email: EmailFacet;
+        phone: PhoneFacet;
+    };
+
+type EmailFacet = 
+    record {
+        addresses: vec VerifiableEmailAddress;
+    };
+
+type PhoneFacet = 
+    record {
+        numbers: vec VerifiablePhoneNumber;
+    };
+
+type VerificationCodeSentState =
+    record {
+        code: text;
+        date: TimestampMillis;
+    };
+
+type VerificationCodeVerifiedState =
+    record {
+        date: TimestampMillis;
+    };
+
+type VerificationCodeStatus =
+    variant {
+        Pending;
+        Sent: VerificationCodeSentState;
+        Verified: VerificationCodeVerifiedState;
+    };
+
+type VerifiableEmailAddress =
+    record {
+        id: FieldId;
+        status: VerificationCodeStatus;
+        added: TimestampMillis;
+        value: text;
+    };
+
+type VerifiablePhoneNumber =
+    record {
+        id: FieldId;
+        status: VerificationCodeStatus;
+        added: TimestampMillis;
+        value: PhoneNumber;
+    };
+
+type AppEmailAddress = 
+    record {
+        value: text;
+        verified: bool;
+    };
+
+type AppEmailFacet = 
+    record {
+        any_verified: bool;
+        addresses: vec AppEmailAddress;
+    };
+
+type AppPhoneFacet = 
+    record {
+        any_verified: bool;
+        numbers: vec AppPhoneNumber;
+    };    
+
+type AppPhoneNumber = 
+    record {
+        value: text;
+        verified: bool;
+    };
