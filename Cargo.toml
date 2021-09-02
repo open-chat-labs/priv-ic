@@ -6,4 +6,5 @@ members = [
     "backend/external/verification_code_sender/cli",
     "backend/external/verification_code_sender/core",
     "backend/libraries/types",
+    "backend/libraries/utils",
 ]
