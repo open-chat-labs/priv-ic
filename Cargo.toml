@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "backend/canisters/identity/api",
+    "backend/external/verification_code_sender/aws",
+    "backend/external/verification_code_sender/cli",
+    "backend/external/verification_code_sender/core",
+]

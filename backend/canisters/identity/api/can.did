@@ -1,0 +1,32 @@
+import "../../../libraries/types/can.did";
+
+type AddPhoneNumberArgs =
+    record {
+    };
+
+type AddPhoneNumberResponse =
+    variant {
+    };
+
+type SendPhoneNumberVerificationCodeArgs =
+    record {
+    };
+
+type SendPhoneNumberVerificationCodeResponse =
+    variant {
+    };
+
+type ConfirmPhoneNumberArgs =
+    record {
+    };
+
+type ConfirmPhoneNumberResponse =
+    variant {
+    };
+
+service: {
+    // Phone number
+    add_phone_number: (AddPhoneNumberArgs) -> (AddPhoneNumberResponse);
+    send_phone_number_verification_code: (SendPhoneNumberVerificationCodeArgs) -> (SendPhoneNumberVerificationCodeResponse);
+    confirm_phone_number: (ConfirmPhoneNumberArgs) -> (ConfirmPhoneNumberResponse);
+}
