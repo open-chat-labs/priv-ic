@@ -5,4 +5,5 @@ members = [
     "backend/external/verification_code_sender/aws",
     "backend/external/verification_code_sender/cli",
     "backend/external/verification_code_sender/core",
+    "backend/libraries/types",
 ]

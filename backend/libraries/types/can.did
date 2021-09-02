@@ -84,3 +84,16 @@ type AppPhoneNumber =
         value: text;
         verified: bool;
     };
+
+type VerificationCode =
+    record {
+        index: nat64;
+        code: text;
+        target: VerificationCodeTarget;
+    };
+
+type VerificationCodeTarget =
+    variant {
+        Phone: text;
+        Email: text;
+    };
