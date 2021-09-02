@@ -6,3 +6,13 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.51"
+candid = "0.7.6"
+futures = "0.3.17"
+garcon = "0.2.3"
+ic-agent = "0.6.0"
+identity_canister_api = { path = "../../../canisters/identity/api" }
+log = "0.4.14"
+serde = "1.0.130"
+tokio = "1.11.0"
+types = { path = "../../../libraries/types" }

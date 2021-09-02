@@ -6,3 +6,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-trait = "0.1.51"
+candid = "0.7.6"
+dotenv = "0.15.0"
+env_logger = "0.9.0"
+tokio = { version = "1.10.0", features = ["macros", "time"] }
+types = { path = "../../../libraries/types" }
+verification_code_sender = { path = "../core" }
