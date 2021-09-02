@@ -124,18 +124,29 @@ type ConfirmVerificationCodeResponse =
 
 type VerificationCodesArgs =
     record {
+        from_index: nat64;
     };
 
 type VerificationCodesResponse =
     variant {
+        Success(VerificationCodesSuccessResult);
+        NotAuthorized;
+    };
+
+type VerificationCodesSuccessResult =
+    record {
+        verification_codes: vec VerificationCode;
     };
 
 type RemoveVerificationCodesArgs =
     record {
+        up_to_index: nat64;
     };
 
 type RemoveVerificationCodesResponse =
     variant {
+        Success;
+        NotAuthorized;
     };
 
 service: {
