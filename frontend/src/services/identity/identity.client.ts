@@ -45,7 +45,7 @@ export class IdentityClient extends CandidService implements IIdentityClient {
     sendVerificationCode(id: bigint): Promise<SendCodeResponse> {
         return this.handleResponse(
             this.identityService.send_verification_code({
-                field_id: id,
+                attribute_id: id,
             }),
             sendCodeResponse
         );
@@ -53,7 +53,7 @@ export class IdentityClient extends CandidService implements IIdentityClient {
     confirmVerificationCode(id: bigint, code: string): Promise<ConfirmCodeResponse> {
         return this.handleResponse(
             this.identityService.confirm_verification_code({
-                field_id: id,
+                attribute_id: id,
                 verification_code: code,
             }),
             confirmCodeResponse

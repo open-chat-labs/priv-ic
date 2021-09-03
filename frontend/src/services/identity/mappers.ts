@@ -59,8 +59,17 @@ export function sendCodeResponse(candid: ApiSendVerificationCodeResponse): SendC
     if ("AlreadySent" in candid) {
         return "already_sent";
     }
-    if ("NotFound" in candid) {
-        return "not_found";
+    if ("AlreadyVerified" in candid) {
+        return "already_verified";
+    }
+    if ("AttributeNotFound" in candid) {
+        return "attribute_not_found";
+    }
+    if ("IdentityNotFound" in candid) {
+        return "identity_not_found";
+    }
+    if ("Unsupported" in candid) {
+        return "unsupported";
     }
     throw new UnsupportedValueError(
         "Unexpected send verification code response type returned",
@@ -74,7 +83,7 @@ export function registerPhoneResponse(
     if ("Success" in candid) {
         return {
             kind: "register_phone_success",
-            id: candid.Success.field_id,
+            id: candid.Success.attribute_id,
         };
     }
     if ("AlreadyRegistered" in candid) {
@@ -154,6 +163,9 @@ function verificationStatus(candid: ApiVerificationCodeStatus): VerificationCode
     }
     if ("Pending" in candid) {
         return "pending";
+    }
+    if ("Expired" in candid) {
+        return "expired";
     }
     throw new UnsupportedValueError("Unexpected verification code type returned", candid);
 }

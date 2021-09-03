@@ -17,9 +17,10 @@ export interface AppProfileViewSuccessResult {
   'email' : AppEmailFacet,
   'phone' : AppPhoneFacet,
 }
+export type AttributeId = bigint;
 export interface ConfirmVerificationCodeArgs {
-  'verification_code' : string,
   'attribute_id' : AttributeId,
+  'verification_code' : string,
 }
 export type ConfirmVerificationCodeResponse = { 'NotSent' : null } |
   { 'AlreadyConfirmed' : null } |
@@ -28,7 +29,6 @@ export type ConfirmVerificationCodeResponse = { 'NotSent' : null } |
   { 'ConfirmationCodeExpired' : null } |
   { 'ConfirmationCodeIncorrect' : null };
 export interface EmailFacet { 'addresses' : Array<VerifiableEmailAddress> }
-export type AttributeId = bigint;
 export interface Identity { 'email' : EmailFacet, 'phone' : PhoneFacet }
 export interface IndexedVerificationCode {
   'value' : VerificationCode,
@@ -46,7 +46,9 @@ export interface ProfileSuccessResult {
   'apps' : Array<App>,
   'identity' : Identity,
 }
-export interface RegisterEmailAddressSuccessResult { 'attribute_id' : AttributeId }
+export interface RegisterEmailAddressSuccessResult {
+  'attribute_id' : AttributeId,
+}
 export interface RegisterEmailArgs { 'email_address' : string }
 export type RegisterEmailResponse = { 'AlreadyRegistered' : null } |
   { 'Success' : RegisterEmailAddressSuccessResult } |
@@ -55,19 +57,24 @@ export interface RegisterPhoneNumberArgs { 'phone_number' : PhoneNumber }
 export type RegisterPhoneNumberResponse = { 'AlreadyRegistered' : null } |
   { 'Success' : RegisterPhoneNumberSuccessResult } |
   { 'InvalidPhoneNumber' : null };
-export interface RegisterPhoneNumberSuccessResult { 'attribute_id' : AttributeId }
+export interface RegisterPhoneNumberSuccessResult {
+  'attribute_id' : AttributeId,
+}
 export interface RemoveVerificationCodesArgs { 'up_to_index' : bigint }
 export type RemoveVerificationCodesResponse = { 'NotAuthorized' : null } |
   { 'Success' : null };
 export interface SendVerificationCodeArgs { 'attribute_id' : AttributeId }
-export type SendVerificationCodeResponse = { 'NotFound' : null } |
+export type SendVerificationCodeResponse = { 'AttributeNotFound' : null } |
+  { 'Unsupported' : null } |
   { 'Success' : null } |
+  { 'AlreadyVerified' : null } |
+  { 'IdentityNotFound' : null } |
   { 'AlreadySent' : null };
 export interface SetVisibleProfileAttributesArgs {
   'attributes' : Array<AttributeId>,
   'app_domain_name' : string,
 }
-export type SetVisibleProfileAttributesResponse = ;
+export type SetVisibleProfileAttributesResponse = { 'Success' : null };
 export type TimestampMillis = bigint;
 export interface VerifiableEmailAddress {
   'id' : AttributeId,
@@ -85,16 +92,12 @@ export interface VerificationCode {
   'code' : string,
   'target' : VerificationCodeTarget,
 }
-export interface VerificationCodeSentState {
-  'code' : string,
-  'date' : TimestampMillis,
-}
-export type VerificationCodeStatus = { 'Sent' : VerificationCodeSentState } |
-  { 'Verified' : VerificationCodeVerifiedState } |
+export type VerificationCodeStatus = { 'Sent' : TimestampMillis } |
+  { 'Verified' : TimestampMillis } |
+  { 'Expired' : TimestampMillis } |
   { 'Pending' : null };
 export type VerificationCodeTarget = { 'Email' : string } |
   { 'Phone' : string };
-export interface VerificationCodeVerifiedState { 'date' : TimestampMillis }
 export interface VerificationCodesArgs { 'from_index' : bigint }
 export type VerificationCodesResponse = { 'NotAuthorized' : null } |
   { 'Success' : VerificationCodesSuccessResult };
@@ -104,7 +107,9 @@ export interface VerificationCodesSuccessResult {
 export interface VisibleProfileAttributesArgs { 'app_domain_name' : string }
 export type VisibleProfileAttributesResponse = { 'NotFound' : null } |
   { 'Success' : VisibleProfileAttributesSuccessResult };
-export interface VisibleProfileAttributesSuccessResult { 'attributes' : Array<AttributeId> }
+export interface VisibleProfileAttributesSuccessResult {
+  'attributes' : Array<AttributeId>,
+}
 export interface _SERVICE {
   'app_profile_view' : (arg_0: AppProfileViewArgs) => Promise<
       AppProfileViewResponse
@@ -131,7 +136,7 @@ export interface _SERVICE {
   'set_visible_profile_attributes' : (
       arg_0: SetVisibleProfileAttributesArgs,
     ) => Promise<SetVisibleProfileAttributesResponse>,
-  'visible_profile_attributes' : (arg_0: VisibleProfileAttributesArgs) => Promise<
-      VisibleProfileAttributesResponse
-    >,
+  'visible_profile_attributes' : (
+      arg_0: VisibleProfileAttributesArgs,
+    ) => Promise<VisibleProfileAttributesResponse>,
 }

@@ -64,7 +64,7 @@ export type Verifiable<T> = {
     value: T;
 };
 
-export type VerificationCodeStatus = "pending" | "sent" | "verified";
+export type VerificationCodeStatus = "pending" | "sent" | "verified" | "expired";
 
 export type RegisterPhoneResponse =
     | RegisterPhoneSuccess
@@ -84,7 +84,13 @@ export type RegisterPhoneInvalid = {
     kind: "register_phone_invalid";
 };
 
-export type SendCodeResponse = "success" | "already_sent" | "not_found";
+export type SendCodeResponse =
+    | "success"
+    | "already_sent"
+    | "identity_not_found"
+    | "attribute_not_found"
+    | "already_verified"
+    | "unsupported";
 
 export type ConfirmCodeResponse =
     | "success"
