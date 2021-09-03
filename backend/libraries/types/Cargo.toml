@@ -8,3 +8,4 @@ edition = "2018"
 [dependencies]
 candid = "0.7.6"
 serde = "1.0.130"
+uuid = { version = "0.8", features = ["v4"] }

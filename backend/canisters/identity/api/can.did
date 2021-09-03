@@ -67,7 +67,6 @@ type RegisterPhoneNumberResponse =
     variant {
         Success: RegisterPhoneNumberSuccessResult;
         AlreadyRegistered;
-        AlreadyRegisteredByOther;
         InvalidPhoneNumber;
     };
 
@@ -85,7 +84,6 @@ type RegisterEmailResponse =
     variant {
         Success: RegisterEmailAddressSuccessResult;
         AlreadyRegistered;
-        AlreadyRegisteredByOther;
         InvalidEmailAddress;
     };
 
