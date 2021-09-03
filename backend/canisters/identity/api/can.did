@@ -106,11 +106,12 @@ type ConfirmVerificationCodeArgs =
 type ConfirmVerificationCodeResponse =
     variant {
         Success;
-        ConfirmationCodeIncorrect;
-        ConfirmationCodeExpired;
-        AlreadyConfirmed;
-        NotSent;
-        NotFound;
+        VerificationCodeInvalid;
+        VerificationCodeIncorrect;
+        VerificationCodeExpired;
+        AlreadyVerified;
+        AttributeNotFound;
+        IdentityNotFound;
     };
 
 type VerificationCodesArgs =

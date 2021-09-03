@@ -26,11 +26,11 @@ fn send_verification_code_impl(args: Args, runtime_state: &mut RuntimeState) -> 
     };
 
     match attribute.status() {
-        VerificationCodeStatus::Sent(state) => { 
+        VerificationCodeStatus::Sent(state) => {
             if state.date < now + VERIFICATION_CODE_EXPIRY_MILLIS {
                 return AlreadySent;
             }
-        },
+        }
         VerificationCodeStatus::Verified(_) => return AlreadyVerified,
     };
 
