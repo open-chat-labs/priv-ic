@@ -43,7 +43,6 @@ pub struct VerifiableAttribute<T: CandidType + Clone> {
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
 pub enum VerificationCodeStatus {
-    Pending,
     Sent(TimestampMillis),
     Expired(TimestampMillis),
     Verified(TimestampMillis),

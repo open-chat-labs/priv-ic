@@ -972,7 +972,6 @@ dependencies = [
  "ic-cdk",
  "ic-cdk-macros",
  "identity_canister_api",
- "phonenumber",
  "serde",
  "types",
  "utils",
@@ -2397,6 +2396,7 @@ name = "types"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "phonenumber",
  "serde",
  "uuid",
 ]

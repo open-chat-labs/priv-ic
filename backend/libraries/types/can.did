@@ -30,7 +30,6 @@ type PhoneFacet =
 
 type VerificationCodeStatus =
     variant {
-        Pending;
         Sent: TimestampMillis;
         Expired: TimestampMillis;
         Verified: TimestampMillis;
