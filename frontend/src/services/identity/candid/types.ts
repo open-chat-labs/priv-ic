@@ -30,6 +30,10 @@ export type ConfirmVerificationCodeResponse = { 'NotSent' : null } |
 export interface EmailFacet { 'addresses' : Array<VerifiableEmailAddress> }
 export type FieldId = bigint;
 export interface Identity { 'email' : EmailFacet, 'phone' : PhoneFacet }
+export interface IndexedVerificationCode {
+  'value' : VerificationCode,
+  'index' : bigint,
+}
 export interface InitArgs {
   'verification_code_sender_principals' : Array<Principal>,
 }
@@ -63,7 +67,7 @@ export interface SetVisibleProfileFieldsArgs {
   'fields' : Array<FieldId>,
   'app_domain_name' : string,
 }
-export type SetVisibleProfileFieldsResponse = ;
+export type SetVisibleProfileFieldsResponse = { 'Success' : null };
 export type TimestampMillis = bigint;
 export interface VerifiableEmailAddress {
   'id' : FieldId,
@@ -80,7 +84,6 @@ export interface VerifiablePhoneNumber {
 export interface VerificationCode {
   'code' : string,
   'target' : VerificationCodeTarget,
-  'index' : bigint,
 }
 export interface VerificationCodeSentState {
   'code' : string,
@@ -96,7 +99,7 @@ export interface VerificationCodesArgs { 'from_index' : bigint }
 export type VerificationCodesResponse = { 'NotAuthorized' : null } |
   { 'Success' : VerificationCodesSuccessResult };
 export interface VerificationCodesSuccessResult {
-  'verification_codes' : Array<VerificationCode>,
+  'verification_codes' : Array<IndexedVerificationCode>,
 }
 export interface VisibleProfileFieldsArgs { 'app_domain_name' : string }
 export type VisibleProfileFieldsResponse = { 'NotFound' : null } |

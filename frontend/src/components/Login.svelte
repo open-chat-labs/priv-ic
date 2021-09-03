@@ -7,11 +7,11 @@
 </script>
 
 <ModalPage>
-    <h4 class="subtitle">Sign in required ...</h4>
+    <h4 class="subtitle">Login required ...</h4>
     <h1 class="title">Login to PrivIC</h1>
     <p class="blurb">
-        In order to use the PrivIC service you must first authenticate with the Internet Identity
-        service
+        You personal information in one place and under <strong>your</strong> control. Share only what
+        you choose to with your favourite dApps.
     </p>
     <Button disabled={loading} {loading} on:click={() => dispatch("login")}>Login</Button>
 </ModalPage>
@@ -24,6 +24,7 @@
 
     .title {
         @include font(bold, normal, fs-220);
+        text-shadow: 1px 1px rgba(255, 255, 255, 0.2);
         margin: $sp5 0;
     }
     .blurb {

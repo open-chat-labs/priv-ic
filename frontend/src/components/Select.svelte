@@ -10,7 +10,7 @@
 
 <style type="text/scss">
     :global(option) {
-        color: var(--input-txt);
+        color: #191919;
     }
 
     .select {
@@ -21,16 +21,16 @@
         line-height: 24px;
         padding: $sp1 $sp3;
         @include font(book, normal, fs-100);
-        color: var(--input-txt);
-        background-color: var(--input-bg);
-        border: 1px solid var(--input-bd);
+        color: #191919;
+        background-color: #ffffff;
+        border: 1px solid #dddddd;
         outline: none;
         border-radius: $sp2;
         margin-bottom: $sp4;
 
         &.invalid {
-            border: 1px solid var(--error);
-            box-shadow: 0 0 5px 1px var(--error);
+            border: 1px solid #cf6679;
+            box-shadow: 0 0 5px 1px #cf6679;
         }
     }
 </style>

@@ -3,6 +3,6 @@
 <style type="text/scss">
     .loading {
         height: 100%;
-        @include loading-spinner(3em, 1.5em, false, var(--spinner));
+        @include loading-spinner(3em, 1.5em, false, #191919);
     }
 </style>

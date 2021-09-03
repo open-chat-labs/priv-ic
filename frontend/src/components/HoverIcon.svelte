@@ -14,7 +14,7 @@
         cursor: pointer;
 
         &:hover {
-            background-color: var(--icon-hv);
+            background-color: #dddddd;
         }
     }
 </style>

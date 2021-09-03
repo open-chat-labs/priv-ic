@@ -1,17 +1,21 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import Loading from "./components/Loading.svelte";
     import Login from "./components/Login.svelte";
+    import Profile from "./components/Profile.svelte";
     import { getIdentity, login } from "./services/auth";
+    import { ServiceContainer } from "./services/serviceContainer";
 
     let loginRequired: boolean = false;
     let loginInProgress: boolean = false;
+    let serviceContainer: ServiceContainer | undefined = undefined;
 
     onMount(() => {
         getIdentity().then((id) => {
             if (id.getPrincipal().isAnonymous()) {
                 loginRequired = true;
             } else {
-                console.log("we are signed in: ", id);
+                serviceContainer = new ServiceContainer(id);
             }
         });
         calculateHeight();
@@ -23,21 +27,25 @@
         document.documentElement.style.setProperty("--vh", `${vh}px`);
     }
 
+    function getServiceContainer(): ServiceContainer {
+        return serviceContainer!;
+    }
+
     function startLogin() {
         loginInProgress = true;
         login().then((id) => {
             loginInProgress = loginRequired = false;
-            console.log("we are signed in: ", id);
+            serviceContainer = new ServiceContainer(id);
         });
     }
 </script>
 
 {#if loginRequired}
     <Login loading={loginInProgress} on:login={startLogin} />
+{:else if serviceContainer !== undefined}
+    <Profile serviceContainer={getServiceContainer()} />
 {:else}
-    <main class="main">
-        <h1>We are signed in</h1>
-    </main>
+    <Loading />
 {/if}
 
 <svelte:window on:resize={calculateHeight} />
@@ -45,13 +53,5 @@
 <style type="text/scss">
     :global(body) {
         background-color: #000000;
-    }
-
-    .main {
-        max-width: 800px;
-        padding: 50px;
-        @include fullHeight();
-        margin: auto;
-        background-color: #ffffff;
     }
 </style>

@@ -53,10 +53,13 @@ export const idlFactory = ({ IDL }) => {
   const VerificationCode = IDL.Record({
     'code' : IDL.Text,
     'target' : VerificationCodeTarget,
+  });
+  const IndexedVerificationCode = IDL.Record({
+    'value' : VerificationCode,
     'index' : IDL.Nat64,
   });
   const VerificationCodesSuccessResult = IDL.Record({
-    'verification_codes' : IDL.Vec(VerificationCode),
+    'verification_codes' : IDL.Vec(IndexedVerificationCode),
   });
   const VerificationCodesResponse = IDL.Variant({
     'NotAuthorized' : IDL.Null,
@@ -132,7 +135,7 @@ export const idlFactory = ({ IDL }) => {
     'fields' : IDL.Vec(FieldId),
     'app_domain_name' : IDL.Text,
   });
-  const SetVisibleProfileFieldsResponse = IDL.Variant({});
+  const SetVisibleProfileFieldsResponse = IDL.Variant({ 'Success' : IDL.Null });
   const VisibleProfileFieldsArgs = IDL.Record({ 'app_domain_name' : IDL.Text });
   const VisibleProfileFieldsSuccessResult = IDL.Record({
     'fields' : IDL.Vec(FieldId),
