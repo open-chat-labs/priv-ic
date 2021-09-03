@@ -24,11 +24,11 @@
 <style type="text/scss">
     button {
         transition: background ease-in-out 200ms;
-        background: var(--button-bg);
-        color: var(--button-txt);
+        background: #22a7f2;
+        color: #ffffff;
         padding: $sp3 $sp6;
         cursor: pointer;
-        border: 1px solid var(--button-bd);
+        border: 1px solid #22a7f2;
         min-height: 45px;
         min-width: 150px;
         @include font(book, normal, fs-100);
@@ -40,24 +40,24 @@
         }
 
         &:hover {
-            background: var(--button-hv);
+            background: #52baf5;
         }
 
         &.loading {
-            @include loading-spinner(1em, 0.5em, false, var(--button-spinner));
+            @include loading-spinner(1em, 0.5em, false, #ffffff);
         }
 
         &.disabled {
-            background: var(--button-disabled);
-            color: var(--button-disabled-txt);
+            background: "#cccccc";
+            color: "#999999";
             cursor: not-allowed;
-            border: 1px solid var(--button-disabled-bd);
+            border: 1px solid transparent;
         }
 
         &.secondary {
-            background: var(--button-txt);
-            color: var(--button-bg);
-            border: 1px solid var(--button-bg);
+            background: #ffffff;
+            color: #22a7f2;
+            border: 1px solid #22a7f2;
         }
 
         &.fill {
