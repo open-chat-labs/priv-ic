@@ -33,7 +33,7 @@ impl IdentityMap {
 
         let identity = match self.identities_by_principal.entry(principal) {
             Occupied(e) => e.into_mut(),
-            Vacant(e) => e.insert(Identity::default())
+            Vacant(e) => e.insert(Identity::default()),
         };
 
         let id = FieldId::new();
