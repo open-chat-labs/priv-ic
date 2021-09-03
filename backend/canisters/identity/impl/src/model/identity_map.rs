@@ -1,12 +1,10 @@
+use crate::model::identity::Identity;
+use crate::model::identity::{Attribute, VerifiableAttribute, VerificationCodeStatus};
 use candid::Principal;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::HashMap;
 use std::collections::HashSet;
-use types::Identity;
-use types::TimestampMillis;
-use types::VerifiableField;
-use types::VerificationCodeStatus;
-use types::{FieldId, PhoneNumber};
+use types::{AttributeId, PhoneNumber, TimestampMillis};
 
 #[derive(Default)]
 pub struct IdentityMap {
@@ -21,13 +19,17 @@ impl IdentityMap {
         self.identities_by_principal.get(principal)
     }
 
+    pub fn get_by_principal_mut(&mut self, principal: &Principal) -> Option<&mut Identity> {
+        self.identities_by_principal.get_mut(principal)
+    }
+
     pub fn try_register_phone_number(
         &mut self,
         principal: Principal,
         phone_number: PhoneNumber,
         now: TimestampMillis,
-    ) -> Option<FieldId> {
-        if self.registered_phone_numbers.contains(&phone_number) {
+    ) -> Option<AttributeId> {
+        if !self.registered_phone_numbers.insert(phone_number.clone()) {
             return None;
         }
 
@@ -36,16 +38,15 @@ impl IdentityMap {
             Vacant(e) => e.insert(Identity::default()),
         };
 
-        let id = FieldId::new();
-        let field = VerifiableField::<PhoneNumber> {
+        let id = AttributeId::new();
+        let attribute = VerifiableAttribute::<PhoneNumber> {
             id,
             status: VerificationCodeStatus::Pending,
             added: now,
-            value: phone_number.clone(),
+            value: phone_number,
         };
 
-        identity.phone.numbers.push(field);
-        self.registered_phone_numbers.insert(phone_number);
+        identity.add(Attribute::PhoneNumber(attribute));
 
         Some(id)
     }

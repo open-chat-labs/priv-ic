@@ -1,4 +1,4 @@
-type FieldId = nat;
+type AttributeId = nat;
 type TimestampMillis = nat64;
 
 type App =
@@ -28,27 +28,17 @@ type PhoneFacet =
         numbers: vec VerifiablePhoneNumber;
     };
 
-type VerificationCodeSentState =
-    record {
-        code: text;
-        date: TimestampMillis;
-    };
-
-type VerificationCodeVerifiedState =
-    record {
-        date: TimestampMillis;
-    };
-
 type VerificationCodeStatus =
     variant {
         Pending;
-        Sent: VerificationCodeSentState;
-        Verified: VerificationCodeVerifiedState;
+        Sent: TimestampMillis;
+        Expired: TimestampMillis;
+        Verified: TimestampMillis;
     };
 
 type VerifiableEmailAddress =
     record {
-        id: FieldId;
+        id: AttributeId;
         status: VerificationCodeStatus;
         added: TimestampMillis;
         value: text;
@@ -56,7 +46,7 @@ type VerifiableEmailAddress =
 
 type VerifiablePhoneNumber =
     record {
-        id: FieldId;
+        id: AttributeId;
         status: VerificationCodeStatus;
         added: TimestampMillis;
         value: PhoneNumber;

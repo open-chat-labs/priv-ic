@@ -16,20 +16,20 @@ type ProfileSuccessResult =
         apps: vec App;
     };
 
-type VisibleProfileFieldsArgs =
+type VisibleProfileAttributesArgs =
     record {
         app_domain_name: text;
     };
 
-type VisibleProfileFieldsResponse =
+type VisibleProfileAttributesResponse =
     variant {
-        Success: VisibleProfileFieldsSuccessResult;
+        Success: VisibleProfileAttributesSuccessResult;
         NotFound;
     };
 
-type VisibleProfileFieldsSuccessResult =
+type VisibleProfileAttributesSuccessResult =
     record {
-        fields: vec FieldId;
+        attributes: vec AttributeId;
     };
 
 type AppProfileViewArgs =
@@ -48,13 +48,13 @@ type AppProfileViewSuccessResult =
         phone: AppPhoneFacet;
     };
 
-type SetVisibleProfileFieldsArgs =
+type SetVisibleProfileAttributesArgs =
     record {
         app_domain_name: text;
-        fields: vec FieldId;
+        attributes: vec AttributeId;
     };
 
-type SetVisibleProfileFieldsResponse =
+type SetVisibleProfileAttributesResponse =
     variant {
     };
 
@@ -72,7 +72,7 @@ type RegisterPhoneNumberResponse =
 
 type RegisterPhoneNumberSuccessResult =
     record {
-        field_id: FieldId;
+        attribute_id: AttributeId;
     };
 
 type RegisterEmailArgs =
@@ -89,24 +89,27 @@ type RegisterEmailResponse =
 
 type RegisterEmailAddressSuccessResult =
     record {
-        field_id: FieldId;
+        attribute_id: AttributeId;
     };
 
 type SendVerificationCodeArgs =
     record {
-        field_id: FieldId;
+        attribute_id: AttributeId;
     };
 
 type SendVerificationCodeResponse =
     variant {
         Success;
         AlreadySent;
-        NotFound;
+        AlreadyVerified;
+        IdentityNotFound;
+        AttributeNotFound;
+        Unsupported;
     };
 
 type ConfirmVerificationCodeArgs =
     record {
-        field_id: FieldId;
+        attribute_id: AttributeId;
         verification_code: text;
     };
 
@@ -157,13 +160,13 @@ service: (InitArgs) -> {
     profile: (ProfileArgs) -> (ProfileResponse) query;
 
     // A view of the profile for the given app
-    visible_profile_fields: (VisibleProfileFieldsArgs) -> (VisibleProfileFieldsResponse) query;
+    visible_profile_attributes: (VisibleProfileAttributesArgs) -> (VisibleProfileAttributesResponse) query;
 
     // Called by an app to get the view of the profile visible to the app
     app_profile_view: (AppProfileViewArgs) -> (AppProfileViewResponse) query;
 
-    // Set the list of fields to which you grant the given app access
-    set_visible_profile_fields: (SetVisibleProfileFieldsArgs) -> (SetVisibleProfileFieldsResponse);
+    // Set the list of attributes to which you grant the given app access
+    set_visible_profile_attributes: (SetVisibleProfileAttributesArgs) -> (SetVisibleProfileAttributesResponse);
 
     register_phone_number: (RegisterPhoneNumberArgs) -> (RegisterPhoneNumberResponse);
     register_email: (RegisterEmailArgs) -> (RegisterEmailResponse);

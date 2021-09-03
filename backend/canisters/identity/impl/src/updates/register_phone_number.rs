@@ -30,7 +30,7 @@ fn register_phone_number_impl(args: Args, runtime_state: &mut RuntimeState) -> R
                 now,
             ) {
                 None => AlreadyRegistered,
-                Some(field_id) => Success(SuccessResult { field_id }),
+                Some(attribute_id) => Success(SuccessResult { attribute_id }),
             }
         }
     }
