@@ -4,7 +4,6 @@ use log::info;
 use types::Error;
 use verification_code_sender::sms_sender::SmsSender;
 
-#[allow(dead_code)]
 pub struct SnsClient {
     client: Client,
     sms_topic_arn: String,

@@ -5,7 +5,6 @@ use log::info;
 use types::Error;
 use verification_code_sender::email_sender::EmailSender;
 
-#[allow(dead_code)]
 pub struct SesClient {
     client: Client,
 }
