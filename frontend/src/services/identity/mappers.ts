@@ -10,6 +10,7 @@ import type {
     ApiRegisterPhoneNumberResponse,
     ApiSendVerificationCodeResponse,
     ApiVerificationCodeStatus,
+    ApiVisibleProfileAttributesResponse,
 } from "./candid/idl";
 import {
     nullProfile,
@@ -24,8 +25,26 @@ import {
     SendCodeResponse,
     ConfirmCodeResponse,
     RegisterEmailResponse,
+    VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import { UnsupportedValueError } from "../../utils/error";
+
+export function visibleProfileAttributesResponse(
+    candid: ApiVisibleProfileAttributesResponse
+): VisibleProfileAttributesResponse {
+    if ("Success" in candid) {
+        return candid.Success.attributes;
+    }
+
+    if ("NotFound" in candid) {
+        return "not_found";
+    }
+
+    throw new UnsupportedValueError(
+        "Unexpected visible profile attributes response type returned",
+        candid
+    );
+}
 
 export function confirmCodeResponse(
     candid: ApiConfirmVerificationCodeResponse

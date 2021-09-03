@@ -8,6 +8,7 @@
     export let error: string | undefined = undefined;
     export let serviceContainer: ServiceContainer;
     export let emailAddress: Verifiable<string>;
+    export let granted: boolean = false;
 
     let busy: boolean = false;
     let sendingCode: boolean = false;
@@ -51,6 +52,11 @@
         {emailAddress.value}
     </div>
     <div class="actions">
+        {#if granted}
+            <Button accent={true}>Revoke</Button>
+        {:else}
+            <Button accent={true}>Grant</Button>
+        {/if}
         {#if emailAddress.status === "pending"}
             <Button
                 small={true}
@@ -87,7 +93,7 @@
         min-height: 40px;
         height: 40px;
         margin-right: $sp3;
-        min-width: 100px;
+        min-width: 120px;
     }
 
     :global(.email-address .input-wrapper input) {

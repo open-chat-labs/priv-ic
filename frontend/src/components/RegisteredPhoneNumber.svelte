@@ -8,6 +8,7 @@
     export let error: string | undefined = undefined;
     export let serviceContainer: ServiceContainer;
     export let phoneNumber: Verifiable<PhoneNumber>;
+    export let granted: boolean = false;
 
     let busy: boolean = false;
     let sendingCode: boolean = false;
@@ -51,6 +52,11 @@
         {phoneNumber.value.number}
     </div>
     <div class="actions">
+        {#if granted}
+            <Button accent={true}>Revoke</Button>
+        {:else}
+            <Button accent={true}>Grant</Button>
+        {/if}
         {#if phoneNumber.status === "pending"}
             <Button loading={sendingCode} disabled={busy} on:click={sendVerificationCode}
                 >{sendingCode ? "Sending code" : "Verify"}</Button>
@@ -84,7 +90,7 @@
         min-height: 40px;
         height: 40px;
         margin-right: $sp3;
-        min-width: 100px;
+        min-width: 120px;
     }
 
     :global(.phone-number .input-wrapper input) {

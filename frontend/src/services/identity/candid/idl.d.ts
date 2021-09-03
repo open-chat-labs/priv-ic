@@ -12,6 +12,7 @@ import {
     RegisterEmailResponse,
     SendVerificationCodeResponse,
     ConfirmVerificationCodeResponse,
+    VisibleProfileAttributesResponse,
 } from "./types";
 export {
     _SERVICE as IdentityService,
@@ -26,6 +27,7 @@ export {
     RegisterEmailResponse as ApiRegisterEmailResponse,
     SendVerificationCodeResponse as ApiSendVerificationCodeResponse,
     ConfirmVerificationCodeResponse as ApiConfirmVerificationCodeResponse,
+    VisibleProfileAttributesResponse as ApiVisibleProfileAttributesResponse,
 };
 
 export const idlFactory: IDL.InterfaceFactory;

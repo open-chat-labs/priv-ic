@@ -7,6 +7,7 @@ import type {
     RegisterPhoneResponse,
     SendCodeResponse,
     RegisterEmailResponse,
+    VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import { CandidService } from "../candidService";
 import {
@@ -15,6 +16,7 @@ import {
     registerEmailResponse,
     registerPhoneResponse,
     sendCodeResponse,
+    visibleProfileAttributesResponse,
 } from "./mappers";
 import type { IIdentityClient } from "./identity.client.interface";
 import { IdentityClientMock } from "./identity.client.mock";
@@ -72,6 +74,14 @@ export class IdentityClient extends CandidService implements IIdentityClient {
                 verification_code: code,
             }),
             confirmCodeResponse
+        );
+    }
+    visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse> {
+        return this.handleResponse(
+            this.identityService.visible_profile_attributes({
+                app_domain_name: domainName,
+            }),
+            visibleProfileAttributesResponse
         );
     }
 }

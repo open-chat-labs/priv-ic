@@ -5,6 +5,7 @@
     export let secondary: boolean = false;
     export let small: boolean = false;
     export let fill: boolean = false;
+    export let accent: boolean = false;
 </script>
 
 <button
@@ -15,6 +16,7 @@
     class:small
     {disabled}
     class:secondary
+    class:accent
     class:fill>
     {#if !loading}
         <slot />
@@ -57,6 +59,12 @@
             background: #ffffff;
             color: #191919;
             border: 1px solid #191919;
+        }
+
+        &.accent {
+            background: hotpink;
+            color: #ffffff;
+            border: 1px solid #ffffff;
         }
 
         &.fill {

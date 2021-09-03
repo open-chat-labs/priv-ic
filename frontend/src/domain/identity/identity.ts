@@ -147,3 +147,5 @@ export type ConfirmCodeResponse =
     | "already_confirmed"
     | "not_sent"
     | "not_found";
+
+export type VisibleProfileAttributesResponse = "not_found" | bigint[];

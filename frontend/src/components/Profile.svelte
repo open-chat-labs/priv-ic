@@ -27,7 +27,9 @@
     let profile: Profile;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
+    let loadingAppProfile: boolean = false;
     let selectedApp: ClientAppType | undefined = undefined;
+    let visibleAttributes: bigint[] = [];
 
     onMount(() => {
         serviceContainer.getProfile().then((p) => {
@@ -55,6 +57,15 @@
 
     function selectApp(app: ClientAppType) {
         selectedApp = app;
+        loadingAppProfile = true;
+        serviceContainer
+            .visibleProfileAttributes(app.domainName)
+            .then((resp) => {
+                if (resp !== "not_found") {
+                    visibleAttributes = resp;
+                }
+            })
+            .finally(() => (loadingAppProfile = false));
     }
 </script>
 
@@ -81,6 +92,7 @@
                     <div class="section-body client-apps">
                         {#each profile.apps as app, i (app)}
                             <ClientApp
+                                loading={loadingAppProfile}
                                 selected={selectedApp === app}
                                 on:click={() => selectApp(app)}
                                 {app} />
@@ -108,6 +120,7 @@
                     {:else}
                         {#each profile.identity.phone.numbers as phoneNumber, i (phoneNumber)}
                             <RegisteredPhoneNumber
+                                granted={visibleAttributes.includes(phoneNumber.id)}
                                 on:unregistered={unregisterPhone}
                                 {phoneNumber}
                                 {serviceContainer} />
@@ -135,6 +148,7 @@
                     {:else}
                         {#each profile.identity.email.addresses as emailAddress, i (emailAddress)}
                             <RegisteredEmailAddress
+                                granted={visibleAttributes.includes(emailAddress.id)}
                                 on:unregistered={unregisterEmail}
                                 {emailAddress}
                                 {serviceContainer} />

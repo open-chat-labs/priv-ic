@@ -6,6 +6,7 @@ import type {
     RegisterEmailResponse,
     RegisterPhoneResponse,
     SendCodeResponse,
+    VisibleProfileAttributesResponse,
 } from "../domain/identity/identity";
 import { IdentityClient } from "./identity/identity.client";
 import type { IIdentityClient } from "./identity/identity.client.interface";
@@ -35,5 +36,9 @@ export class ServiceContainer {
 
     confirmVerificationCode(id: bigint, code: string): Promise<ConfirmCodeResponse> {
         return this._identityClient.confirmVerificationCode(id, code);
+    }
+
+    visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse> {
+        return this._identityClient.visibleProfileAttributes(domainName);
     }
 }

@@ -7,9 +7,15 @@ import {
     SendCodeResponse,
     ConfirmCodeResponse,
     RegisterEmailResponse,
+    addEmailAddress,
+    VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import type { IIdentityClient } from "./identity.client.interface";
 import { v1 as uuidv1 } from "uuid";
+
+const distrikt = "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/";
+const openchat = "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/";
+const dscvr = "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/";
 
 export function newFieldId(): bigint {
     return BigInt(parseInt(uuidv1().replace(/-/g, ""), 16));
@@ -56,20 +62,28 @@ export class IdentityClientMock implements IIdentityClient {
         });
     }
 
+    visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse> {
+        return new Promise((res) => {
+            setTimeout(() => {
+                res(domainName === openchat ? [BigInt(100), BigInt(200)] : []);
+            }, 1000);
+        });
+    }
+
     getProfile(): Promise<Profile> {
         console.log("Getting mock profile");
         return new Promise((res) => {
-            const prof = addPhoneNumber(
+            let prof = addPhoneNumber(
                 {
                     ...nullProfile,
                     apps: [
-                        { domainName: "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/" }, // distrikt
-                        { domainName: "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/" }, // openchat
-                        { domainName: "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/" }, //dscvr
+                        { domainName: distrikt },
+                        { domainName: openchat },
+                        { domainName: dscvr },
                     ],
                 },
                 {
-                    id: newFieldId(),
+                    id: BigInt(100),
                     status: "pending",
                     added: BigInt(+new Date()),
                     value: {
@@ -78,6 +92,12 @@ export class IdentityClientMock implements IIdentityClient {
                     },
                 }
             );
+            prof = addEmailAddress(prof, {
+                id: BigInt(200),
+                status: "verified",
+                added: BigInt(+new Date()),
+                value: "julian.jelfs@gmail.com",
+            });
             setTimeout(() => {
                 res(prof);
             }, 1000);
