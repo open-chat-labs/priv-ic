@@ -1,11 +1,58 @@
+use std::collections::{hash_map, HashMap};
 use types::{AttributeId, PhoneNumber, TimestampMillis};
 
 pub const VERIFICATION_CODE_EXPIRY_MILLIS: u64 = 60 * 60 * 1000; // 1 hour
 
 #[derive(Clone, Debug, Default)]
 pub struct Identity {
-    pub email_addresses: Vec<VerifiableAttribute<String>>,
-    pub phone_numbers: Vec<VerifiableAttribute<PhoneNumber>>,
+    attributes: HashMap<AttributeId, Attribute>,
+}
+
+impl Identity {
+    pub fn values(&self) -> hash_map::Values<'_, AttributeId, Attribute> {
+        self.attributes.values()
+    }
+
+    pub fn add(&mut self, attribute: Attribute) {
+        self.attributes.insert(attribute.id(), attribute);
+    }
+
+    pub fn get_mut(&mut self, id: &AttributeId) -> Option<&mut Attribute> {
+        self.attributes.get_mut(id)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Attribute {
+    PhoneNumber(VerifiableAttribute<PhoneNumber>),
+    EmailAddress(VerifiableAttribute<String>),
+}
+
+impl Attribute {
+    pub fn id(&self) -> AttributeId {
+        match self {
+            Attribute::PhoneNumber(va) => va.id,
+            Attribute::EmailAddress(va) => va.id,
+        }
+    }
+
+    pub fn set_status(&mut self, status: VerificationCodeStatus) {
+        match self {
+            Attribute::PhoneNumber(va) => {
+                va.status = status;
+            }
+            Attribute::EmailAddress(va) => {
+                va.status = status;
+            }
+        }
+    }
+
+    pub fn status(&self) -> &VerificationCodeStatus {
+        match self {
+            Attribute::PhoneNumber(va) => &va.status,
+            Attribute::EmailAddress(va) => &va.status,
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -20,16 +67,11 @@ pub struct VerifiableAttribute<T: Clone> {
 pub enum VerificationCodeStatus {
     Pending,
     Sent(VerificationCodeSentState),
-    Verified(VerificationCodeVerifiedState),
+    Verified(TimestampMillis),
 }
 
 #[derive(Clone, Debug)]
 pub struct VerificationCodeSentState {
     pub code: String,
-    pub date: TimestampMillis,
-}
-
-#[derive(Clone, Debug)]
-pub struct VerificationCodeVerifiedState {
     pub date: TimestampMillis,
 }

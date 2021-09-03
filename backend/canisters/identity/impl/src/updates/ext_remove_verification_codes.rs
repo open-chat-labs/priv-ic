@@ -15,7 +15,7 @@ fn ext_remove_verification_codes_impl(args: Args, runtime_state: &mut RuntimeSta
             .data
             .verifications_to_send
             .remove(args.up_to_index);
-        
+
         Success
     } else {
         NotAuthorized

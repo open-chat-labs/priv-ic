@@ -1,5 +1,5 @@
 use crate::model::identity::Identity;
-use crate::model::identity::{VerifiableAttribute, VerificationCodeStatus};
+use crate::model::identity::{Attribute, VerifiableAttribute, VerificationCodeStatus};
 use candid::Principal;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::HashMap;
@@ -19,13 +19,17 @@ impl IdentityMap {
         self.identities_by_principal.get(principal)
     }
 
+    pub fn get_by_principal_mut(&mut self, principal: &Principal) -> Option<&mut Identity> {
+        self.identities_by_principal.get_mut(principal)
+    }
+
     pub fn try_register_phone_number(
         &mut self,
         principal: Principal,
         phone_number: PhoneNumber,
         now: TimestampMillis,
     ) -> Option<AttributeId> {
-        if self.registered_phone_numbers.contains(&phone_number) {
+        if !self.registered_phone_numbers.insert(phone_number.clone()) {
             return None;
         }
 
@@ -39,11 +43,10 @@ impl IdentityMap {
             id,
             status: VerificationCodeStatus::Pending,
             added: now,
-            value: phone_number.clone(),
+            value: phone_number,
         };
 
-        identity.phone_numbers.push(attribute);
-        self.registered_phone_numbers.insert(phone_number);
+        identity.add(Attribute::PhoneNumber(attribute));
 
         Some(id)
     }
