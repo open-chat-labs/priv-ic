@@ -1,6 +1,6 @@
 use candid::CandidType;
 use serde::Deserialize;
-use types::VerificationCode;
+use types::{IndexedEvent, VerificationCode};
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Args {
@@ -15,5 +15,5 @@ pub enum Response {
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct SuccessResult {
-    pub verification_codes: Vec<VerificationCode>,
+    pub verification_codes: Vec<IndexedEvent<VerificationCode>>,
 }

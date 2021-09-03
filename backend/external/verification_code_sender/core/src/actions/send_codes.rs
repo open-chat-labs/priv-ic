@@ -16,22 +16,18 @@ pub async fn run(
         .await?
         .map_or(0, |i| i + 1);
 
-    let verification_codes = code_reader.get(from_index).await?;
+    let success_result = code_reader.get(from_index).await?;
 
-    if let Some(latest_index) = verification_codes
-        .verification_codes
-        .last()
-        .map(|e| e.index)
-    {
-        let futures: Vec<_> = verification_codes
+    if let Some(latest_index) = success_result.verification_codes.last().map(|e| e.index) {
+        let futures: Vec<_> = success_result
             .verification_codes
             .into_iter()
-            .map(|c| match c.target {
+            .map(|c| match c.value.target {
                 VerificationCodeTarget::Phone(phone_number) => {
-                    sms_sender.send(phone_number, c.code)
+                    sms_sender.send(phone_number, c.value.code)
                 }
                 VerificationCodeTarget::Email(email_address) => {
-                    email_sender.send(email_address, c.code)
+                    email_sender.send(email_address, c.value.code)
                 }
             })
             .collect();
