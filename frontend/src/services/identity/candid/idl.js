@@ -27,10 +27,10 @@ export const idlFactory = ({ IDL }) => {
     'NotFound' : IDL.Null,
     'Success' : AppProfileViewSuccessResult,
   });
-  const FieldId = IDL.Nat;
+  const AttributeId = IDL.Nat;
   const ConfirmVerificationCodeArgs = IDL.Record({
     'verification_code' : IDL.Text,
-    'field_id' : FieldId,
+    'attribute_id' : AttributeId,
   });
   const ConfirmVerificationCodeResponse = IDL.Variant({
     'NotSent' : IDL.Null,
@@ -78,7 +78,7 @@ export const idlFactory = ({ IDL }) => {
     'Pending' : IDL.Null,
   });
   const VerifiableEmailAddress = IDL.Record({
-    'id' : FieldId,
+    'id' : AttributeId,
     'status' : VerificationCodeStatus,
     'added' : TimestampMillis,
     'value' : IDL.Text,
@@ -91,7 +91,7 @@ export const idlFactory = ({ IDL }) => {
     'number' : IDL.Text,
   });
   const VerifiablePhoneNumber = IDL.Record({
-    'id' : FieldId,
+    'id' : AttributeId,
     'status' : VerificationCodeStatus,
     'added' : TimestampMillis,
     'value' : PhoneNumber,
@@ -108,7 +108,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const RegisterEmailArgs = IDL.Record({ 'email_address' : IDL.Text });
   const RegisterEmailAddressSuccessResult = IDL.Record({
-    'field_id' : FieldId,
+    'attribute_id' : AttributeId,
   });
   const RegisterEmailResponse = IDL.Variant({
     'AlreadyRegistered' : IDL.Null,
@@ -116,30 +116,30 @@ export const idlFactory = ({ IDL }) => {
     'InvalidEmailAddress' : IDL.Null,
   });
   const RegisterPhoneNumberArgs = IDL.Record({ 'phone_number' : PhoneNumber });
-  const RegisterPhoneNumberSuccessResult = IDL.Record({ 'field_id' : FieldId });
+  const RegisterPhoneNumberSuccessResult = IDL.Record({ 'attribute_id' : AttributeId });
   const RegisterPhoneNumberResponse = IDL.Variant({
     'AlreadyRegistered' : IDL.Null,
     'Success' : RegisterPhoneNumberSuccessResult,
     'InvalidPhoneNumber' : IDL.Null,
   });
-  const SendVerificationCodeArgs = IDL.Record({ 'field_id' : FieldId });
+  const SendVerificationCodeArgs = IDL.Record({ 'attribute_id' : AttributeId });
   const SendVerificationCodeResponse = IDL.Variant({
     'NotFound' : IDL.Null,
     'Success' : IDL.Null,
     'AlreadySent' : IDL.Null,
   });
-  const SetVisibleProfileFieldsArgs = IDL.Record({
-    'fields' : IDL.Vec(FieldId),
+  const SetVisibleProfileAttributesArgs = IDL.Record({
+    'attributes' : IDL.Vec(AttributeId),
     'app_domain_name' : IDL.Text,
   });
-  const SetVisibleProfileFieldsResponse = IDL.Variant({});
-  const VisibleProfileFieldsArgs = IDL.Record({ 'app_domain_name' : IDL.Text });
-  const VisibleProfileFieldsSuccessResult = IDL.Record({
-    'fields' : IDL.Vec(FieldId),
+  const SetVisibleProfileAttributesResponse = IDL.Variant({});
+  const VisibleProfileAttributesArgs = IDL.Record({ 'app_domain_name' : IDL.Text });
+  const VisibleProfileAttributesSuccessResult = IDL.Record({
+    'attributes' : IDL.Vec(AttributeId),
   });
-  const VisibleProfileFieldsResponse = IDL.Variant({
+  const VisibleProfileAttributesResponse = IDL.Variant({
     'NotFound' : IDL.Null,
-    'Success' : VisibleProfileFieldsSuccessResult,
+    'Success' : VisibleProfileAttributesSuccessResult,
   });
   return IDL.Service({
     'app_profile_view' : IDL.Func(
@@ -178,14 +178,14 @@ export const idlFactory = ({ IDL }) => {
         [SendVerificationCodeResponse],
         [],
       ),
-    'set_visible_profile_fields' : IDL.Func(
-        [SetVisibleProfileFieldsArgs],
-        [SetVisibleProfileFieldsResponse],
+    'set_visible_profile_attributes' : IDL.Func(
+        [SetVisibleProfileAttributesArgs],
+        [SetVisibleProfileAttributesResponse],
         [],
       ),
-    'visible_profile_fields' : IDL.Func(
-        [VisibleProfileFieldsArgs],
-        [VisibleProfileFieldsResponse],
+    'visible_profile_attributes' : IDL.Func(
+        [VisibleProfileAttributesArgs],
+        [VisibleProfileAttributesResponse],
         ['query'],
       ),
   });

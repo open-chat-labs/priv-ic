@@ -1,6 +1,6 @@
 use candid::CandidType;
 use serde::Deserialize;
-use types::{FieldId, PhoneNumber};
+use types::{AttributeId, PhoneNumber};
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Args {
@@ -16,5 +16,5 @@ pub enum Response {
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct SuccessResult {
-    pub field_id: FieldId,
+    pub attribute_id: AttributeId,
 }
