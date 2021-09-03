@@ -1,6 +1,6 @@
 use crate::model::identity;
-use crate::queries::profile::identity::Attribute::{EmailAddress, PhoneNumber};
-use crate::queries::profile::identity::VERIFICATION_CODE_EXPIRY_MILLIS;
+use crate::model::identity::Attribute::{EmailAddress, PhoneNumber};
+use crate::model::identity::VERIFICATION_CODE_EXPIRY_MILLIS;
 use crate::{RuntimeState, RUNTIME_STATE};
 use candid::CandidType;
 use ic_cdk_macros::query;
@@ -36,7 +36,6 @@ fn map_identity(identity: &identity::Identity, now: TimestampMillis) -> Identity
             added: attribute.added,
             value: attribute.value.clone(),
             status: match &attribute.status {
-                identity::VerificationCodeStatus::Pending => VerificationCodeStatus::Pending,
                 identity::VerificationCodeStatus::Sent(s) => {
                     if s.date < now + VERIFICATION_CODE_EXPIRY_MILLIS {
                         VerificationCodeStatus::Sent(s.date)

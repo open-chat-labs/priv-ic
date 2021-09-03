@@ -65,7 +65,6 @@ pub struct VerifiableAttribute<T: Clone> {
 
 #[derive(Clone, Debug)]
 pub enum VerificationCodeStatus {
-    Pending,
     Sent(VerificationCodeSentState),
     Verified(TimestampMillis),
 }
