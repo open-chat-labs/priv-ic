@@ -85,9 +85,14 @@ type AppPhoneNumber =
         verified: bool;
     };
 
-type VerificationCode =
+type IndexedVerificationCode =
     record {
         index: nat64;
+        value: VerificationCode;
+    };
+
+type VerificationCode =
+    record {
         code: text;
         target: VerificationCodeTarget;
     };

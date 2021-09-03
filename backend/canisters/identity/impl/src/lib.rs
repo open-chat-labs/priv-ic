@@ -2,7 +2,9 @@ use crate::model::identity_map::IdentityMap;
 use candid::Principal;
 use std::cell::RefCell;
 use std::collections::HashSet;
+use types::VerificationCode;
 use utils::env::Environment;
+use utils::event_stream::EventStream;
 
 mod lifecycle;
 mod model;
@@ -24,11 +26,18 @@ impl RuntimeState {
     pub fn new(env: Box<dyn Environment>, data: Data) -> RuntimeState {
         RuntimeState { env, data }
     }
+
+    pub fn is_caller_verification_code_sender(&self) -> bool {
+        self.data
+            .verification_code_sender_principals
+            .contains(&self.env.caller())
+    }
 }
 
 pub struct Data {
     pub verification_code_sender_principals: HashSet<Principal>,
     pub identities: IdentityMap,
+    pub verifications_to_send: EventStream<VerificationCode>,
 }
 
 impl Data {
@@ -38,6 +47,7 @@ impl Data {
                 .into_iter()
                 .collect(),
             identities: IdentityMap::default(),
+            verifications_to_send: EventStream::default(),
         }
     }
 }

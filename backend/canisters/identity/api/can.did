@@ -133,7 +133,7 @@ type VerificationCodesResponse =
 
 type VerificationCodesSuccessResult =
     record {
-        verification_codes: vec VerificationCode;
+        verification_codes: vec IndexedVerificationCode;
     };
 
 type RemoveVerificationCodesArgs =
