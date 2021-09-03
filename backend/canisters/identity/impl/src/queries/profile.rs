@@ -1,4 +1,5 @@
 use crate::model::identity;
+use crate::queries::profile::identity::Attribute::{EmailAddress, PhoneNumber};
 use crate::queries::profile::identity::VERIFICATION_CODE_EXPIRY_MILLIS;
 use crate::{RuntimeState, RUNTIME_STATE};
 use candid::CandidType;
@@ -44,26 +45,32 @@ fn map_identity(identity: &identity::Identity, now: TimestampMillis) -> Identity
                     }
                 }
                 identity::VerificationCodeStatus::Verified(s) => {
-                    VerificationCodeStatus::Verified(s.date)
+                    VerificationCodeStatus::Verified(*s)
                 }
             },
         }
     }
 
+    let mut email_addresses = vec![];
+    let mut phone_numbers = vec![];
+
+    for a in identity.values() {
+        match a {
+            EmailAddress(va) => {
+                email_addresses.push(map_verifiable_attribute(va, now));
+            }
+            PhoneNumber(va) => {
+                phone_numbers.push(map_verifiable_attribute(va, now));
+            }
+        }
+    }
+
     Identity {
         email: EmailFacet {
-            addresses: identity
-                .email_addresses
-                .iter()
-                .map(|e| map_verifiable_attribute(e, now))
-                .collect(),
+            addresses: email_addresses,
         },
         phone: PhoneFacet {
-            numbers: identity
-                .phone_numbers
-                .iter()
-                .map(|e| map_verifiable_attribute(e, now))
-                .collect(),
+            numbers: phone_numbers,
         },
     }
 }

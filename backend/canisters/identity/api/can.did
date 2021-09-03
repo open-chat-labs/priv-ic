@@ -101,7 +101,10 @@ type SendVerificationCodeResponse =
     variant {
         Success;
         AlreadySent;
-        NotFound;
+        AlreadyVerified;
+        IdentityNotFound;
+        AttributeNotFound;
+        Unsupported;
     };
 
 type ConfirmVerificationCodeArgs =
