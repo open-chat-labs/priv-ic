@@ -3,24 +3,25 @@
     import Input from "./Input.svelte";
     import { createEventDispatcher } from "svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
-    import type { PhoneNumber, Verifiable } from "../domain/identity/identity";
+    import type { Verifiable } from "../domain/identity/identity";
     const dispatch = createEventDispatcher();
     export let error: string | undefined = undefined;
     export let serviceContainer: ServiceContainer;
-    export let phoneNumber: Verifiable<PhoneNumber>;
+    export let emailAddress: Verifiable<string>;
 
     let busy: boolean = false;
     let sendingCode: boolean = false;
     let confirmingCode: boolean = false;
     let codeValue: string = "";
 
+    // todo - there's a fair bit of duplication here that would be nice to remove
     function sendVerificationCode() {
         sendingCode = busy = true;
         serviceContainer
-            .sendVerificationCode(phoneNumber.id)
+            .sendVerificationCode(emailAddress.id)
             .then((resp) => {
                 if (resp === "success") {
-                    phoneNumber.status = "sent";
+                    emailAddress.status = "sent";
                 }
             })
             .finally(() => (sendingCode = busy = false));
@@ -29,10 +30,10 @@
     function submitOrResend() {
         confirmingCode = busy = true;
         serviceContainer
-            .confirmVerificationCode(phoneNumber.id, codeValue)
+            .confirmVerificationCode(emailAddress.id, codeValue)
             .then((resp) => {
                 if (resp === "success") {
-                    phoneNumber.status = "verified";
+                    emailAddress.status = "verified";
                 }
             })
             .finally(() => (confirmingCode = busy = false));
@@ -41,21 +42,23 @@
 
     function unregister() {
         // todo - don't have an endpoint for this at the moment
-        dispatch("unregistered", phoneNumber.id);
+        dispatch("unregistered", emailAddress.id);
     }
 </script>
 
-<div class="phone-number">
-    <div class="number">
-        <span class="code">(+{phoneNumber.value.countryCode})</span>
-        {phoneNumber.value.number}
+<div class="email-address">
+    <div class="address">
+        {emailAddress.value}
     </div>
     <div class="actions">
-        {#if phoneNumber.status === "pending"}
-            <Button loading={sendingCode} disabled={busy} on:click={sendVerificationCode}
-                >{sendingCode ? "Sending code" : "Verify"}</Button>
+        {#if emailAddress.status === "pending"}
+            <Button
+                small={true}
+                loading={sendingCode}
+                disabled={busy}
+                on:click={sendVerificationCode}>{sendingCode ? "Sending code" : "Verify"}</Button>
         {/if}
-        {#if phoneNumber.status === "sent"}
+        {#if emailAddress.status === "sent"}
             <Input
                 invalid={error !== undefined}
                 align="center"
@@ -68,7 +71,7 @@
             <Button loading={confirmingCode} disabled={busy} on:click={submitOrResend}
                 >{codeValue.length === 6 ? "Submit code" : "Re-send code"}</Button>
         {/if}
-        {#if phoneNumber.status === "verified"}
+        {#if emailAddress.status === "verified"}
             <!-- todo - this is not really a button -->
             <Button disabled={busy}>Verified</Button>
         {/if}
@@ -80,38 +83,34 @@
 </div>
 
 <style type="text/scss">
-    :global(.phone-number button) {
+    :global(.email-address button) {
         min-height: 40px;
         height: 40px;
         margin-right: $sp3;
         min-width: 100px;
     }
 
-    :global(.phone-number .input-wrapper input) {
+    :global(.email-address .input-wrapper input) {
         min-height: 40px;
         height: 40px;
         margin-bottom: 0;
         border-radius: 0;
     }
 
-    :global(.phone-number .input-wrapper) {
+    :global(.email-address .input-wrapper) {
         margin-right: $sp3;
     }
 
-    .phone-number {
+    .email-address {
         padding: $sp4;
         border-top: 1px solid #dddddd;
 
         &:first-child {
             border-top: none;
         }
-
-        .code {
-            margin-right: $sp3;
-        }
     }
 
-    .number {
+    .address {
         margin-bottom: $sp4;
     }
 

@@ -1,3 +1,9 @@
+export const appLookup: Record<string, string> = {
+    "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/": "Distrikt",
+    "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/": "OpenChat",
+    "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/": "Dscvr",
+};
+
 export const nullProfile: Profile = {
     identity: {
         email: { addresses: [] },

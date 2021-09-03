@@ -5,20 +5,29 @@
         addPhoneNumber,
         removePhoneNumber,
         addEmailAddress,
+        removeEmailAddress,
     } from "../domain/identity/identity";
-    import type { PhoneNumber, Profile, Verifiable } from "../domain/identity/identity";
+    import type {
+        PhoneNumber,
+        Profile,
+        Verifiable,
+        ClientApp as ClientAppType,
+    } from "../domain/identity/identity";
 
     import type { ServiceContainer } from "../services/serviceContainer";
     import HoverIcon from "./HoverIcon.svelte";
     import Loading from "./Loading.svelte";
     import NewPhoneNumber from "./NewPhoneNumber.svelte";
+    import ClientApp from "./ClientApp.svelte";
     import NewEmailAddress from "./NewEmailAddress.svelte";
     import RegisteredPhoneNumber from "./RegisteredPhoneNumber.svelte";
+    import RegisteredEmailAddress from "./RegisteredEmailAddress.svelte";
 
     export let serviceContainer: ServiceContainer;
     let profile: Profile;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
+    let selectedApp: ClientAppType | undefined = undefined;
 
     onMount(() => {
         serviceContainer.getProfile().then((p) => {
@@ -39,6 +48,14 @@
     function unregisterPhone(ev: CustomEvent<bigint>) {
         profile = removePhoneNumber(profile, ev.detail);
     }
+
+    function unregisterEmail(ev: CustomEvent<bigint>) {
+        profile = removeEmailAddress(profile, ev.detail);
+    }
+
+    function selectApp(app: ClientAppType) {
+        selectedApp = app;
+    }
 </script>
 
 <main class="main">
@@ -55,9 +72,23 @@
             <Loading />
         {:else}
             {#if profile.apps.length > 0}
-                <h5>Filter by app</h5>
+                <section class="section">
+                    <div class="section-header">
+                        <h5 class="section-title">Connected apps</h5>
+                        <span class="section-subtitle"
+                            >select a connected app to grant / revoke access</span>
+                    </div>
+                    <div class="section-body client-apps">
+                        {#each profile.apps as app, i (app)}
+                            <ClientApp
+                                selected={selectedApp === app}
+                                on:click={() => selectApp(app)}
+                                {app} />
+                        {/each}
+                    </div>
+                </section>
             {/if}
-            <section class="box">
+            <section class="section">
                 <div class="section-header">
                     <h5 class="section-title">Phone numbers</h5>
                     <div class="icon" on:click={() => (addingPhoneNumber = true)}>
@@ -75,7 +106,7 @@
                     {#if profile.identity.phone.numbers.length === 0 && !addingPhoneNumber}
                         <p class="advice">Click the button above to register a new phone number</p>
                     {:else}
-                        {#each profile.identity.phone.numbers as phoneNumber}
+                        {#each profile.identity.phone.numbers as phoneNumber, i (phoneNumber)}
                             <RegisteredPhoneNumber
                                 on:unregistered={unregisterPhone}
                                 {phoneNumber}
@@ -84,7 +115,7 @@
                     {/if}
                 </div>
             </section>
-            <section class="box">
+            <section class="section">
                 <div class="section-header">
                     <h5 class="section-title">Email addresses</h5>
                     <div class="icon" on:click={() => (addingEmail = true)}>
@@ -102,8 +133,11 @@
                     {#if profile.identity.email.addresses.length === 0 && !addingEmail}
                         <p class="advice">Click the button above to register a new email address</p>
                     {:else}
-                        {#each profile.identity.email.addresses as emailAddress}
-                            <p>{JSON.stringify(emailAddress)}</p>
+                        {#each profile.identity.email.addresses as emailAddress, i (emailAddress)}
+                            <RegisteredEmailAddress
+                                on:unregistered={unregisterEmail}
+                                {emailAddress}
+                                {serviceContainer} />
                         {/each}
                     {/if}
                 </div>
@@ -121,6 +155,7 @@
         @include fullHeight();
         margin: auto;
         background-color: #efefef;
+        overflow: auto;
 
         @include size-below(xs) {
             padding: 20px 20px;
@@ -150,7 +185,7 @@
         @include font(light, normal, fs-90);
     }
 
-    .box {
+    .section {
         @include box-shadow(1);
         background-color: #efefef;
         border-radius: $sp3;
@@ -166,9 +201,18 @@
                 flex: auto;
                 padding: $sp3;
             }
+
+            .section-subtitle {
+                @include font(light, italic, fs-80);
+                padding: $sp3;
+            }
             .icon {
                 flex: 0 0 20px;
             }
+        }
+
+        .client-apps {
+            padding: $sp4;
         }
     }
 </style>
