@@ -1,17 +1,17 @@
 use candid::CandidType;
 use serde::Deserialize;
-use types::{AttributeId, PhoneNumber};
+use types::{AttributeId, AttributeValue};
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Args {
-    pub phone_number: PhoneNumber,
+    pub value: AttributeValue,
 }
 
 #[derive(CandidType, Deserialize, Debug)]
 pub enum Response {
     Success(SuccessResult),
     AlreadyRegistered,
-    InvalidPhoneNumber,
+    InvalidValue,
 }
 
 #[derive(CandidType, Deserialize, Debug)]

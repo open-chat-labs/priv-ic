@@ -1,16 +1,16 @@
+use crate::model::identity::Attribute;
 use crate::model::identity::Identity;
-use crate::model::identity::{Attribute, VerifiableAttribute, VerificationCodeStatus};
 use candid::Principal;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::HashMap;
 use std::collections::HashSet;
-use types::{AttributeId, PhoneNumber, TimestampMillis};
+use types::PhoneNumber;
 
 #[derive(Default)]
 pub struct IdentityMap {
     identities_by_principal: HashMap<Principal, Identity>,
     registered_phone_numbers: HashSet<PhoneNumber>,
-    // email_address_to_principal: HashMap<String, Principal>,
+    registered_email_addresses: HashSet<String>,
     // principal_by_app_principal: HashMap<Principal, Principal>,
 }
 
@@ -23,31 +23,26 @@ impl IdentityMap {
         self.identities_by_principal.get_mut(principal)
     }
 
-    pub fn try_register_phone_number(
-        &mut self,
-        principal: Principal,
-        phone_number: PhoneNumber,
-        now: TimestampMillis,
-    ) -> Option<AttributeId> {
-        if !self.registered_phone_numbers.insert(phone_number.clone()) {
-            return None;
-        }
+    pub fn try_register_attribute(&mut self, principal: Principal, attribute: Attribute) -> bool {
+        match &attribute {
+            Attribute::PhoneNumber(va) => {
+                if !self.registered_phone_numbers.insert(va.value.clone()) {
+                    return false;
+                }
+            }
+            Attribute::EmailAddress(va) => {
+                if !self.registered_email_addresses.insert(va.value.clone()) {
+                    return false;
+                }
+            }
+        };
 
         let identity = match self.identities_by_principal.entry(principal) {
             Occupied(e) => e.into_mut(),
             Vacant(e) => e.insert(Identity::default()),
         };
 
-        let id = AttributeId::new();
-        let attribute = VerifiableAttribute::<PhoneNumber> {
-            id,
-            status: VerificationCodeStatus::Pending,
-            added: now,
-            value: phone_number,
-        };
-
-        identity.add(Attribute::PhoneNumber(attribute));
-
-        Some(id)
+        identity.add(attribute);
+        true
     }
 }

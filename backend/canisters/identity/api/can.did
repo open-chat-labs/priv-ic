@@ -59,36 +59,25 @@ type SetVisibleProfileAttributesResponse =
         Success;
     };
 
-type RegisterPhoneNumberArgs =
+type RegisterAttributeArgs =
     record {
-        phone_number: PhoneNumber;        
+        value: AttributeValue;
     };
 
-type RegisterPhoneNumberResponse =
+type AttributeValue =
     variant {
-        Success: RegisterPhoneNumberSuccessResult;
-        AlreadyRegistered;
-        InvalidPhoneNumber;
+        Email: text;
+        Phone: PhoneNumber;
     };
 
-type RegisterPhoneNumberSuccessResult =
-    record {
-        attribute_id: AttributeId;
-    };
-
-type RegisterEmailArgs =
-    record {
-        email_address: text;
-    };
-
-type RegisterEmailResponse =
+type RegisterAttributeResponse =
     variant {
-        Success: RegisterEmailAddressSuccessResult;
+        Success: RegisterAttributeSuccessResult;
         AlreadyRegistered;
-        InvalidEmailAddress;
+        InvalidValue;
     };
 
-type RegisterEmailAddressSuccessResult =
+type RegisterAttributeSuccessResult =
     record {
         attribute_id: AttributeId;
     };
@@ -117,11 +106,12 @@ type ConfirmVerificationCodeArgs =
 type ConfirmVerificationCodeResponse =
     variant {
         Success;
-        ConfirmationCodeIncorrect;
-        ConfirmationCodeExpired;
-        AlreadyConfirmed;
-        NotSent;
-        NotFound;
+        VerificationCodeInvalid;
+        VerificationCodeIncorrect;
+        VerificationCodeExpired;
+        AlreadyVerified;
+        AttributeNotFound;
+        IdentityNotFound;
     };
 
 type VerificationCodesArgs =
@@ -157,23 +147,22 @@ type InitArgs =
     };
 
 service: (InitArgs) -> {
-    // Your full profile as seen when on the identity app directly
+    // Your full profile consisting of your identity attributes and the apps to which
+    // you have given access to at least one attribute
     profile: (ProfileArgs) -> (ProfileResponse) query;
 
-    // A view of the profile for the given app
+    // The list of attributes visible to the given app
     visible_profile_attributes: (VisibleProfileAttributesArgs) -> (VisibleProfileAttributesResponse) query;
 
-    // Called by an app to get the view of the profile visible to the app
-    app_profile_view: (AppProfileViewArgs) -> (AppProfileViewResponse) query;
-
-    // Set the list of attributes to which you grant the given app access
+    // Set the list of attributes which should be visible to the given app
     set_visible_profile_attributes: (SetVisibleProfileAttributesArgs) -> (SetVisibleProfileAttributesResponse);
 
-    register_phone_number: (RegisterPhoneNumberArgs) -> (RegisterPhoneNumberResponse);
-    register_email: (RegisterEmailArgs) -> (RegisterEmailResponse);
-
+    register_attribute: (RegisterAttributeArgs) -> (RegisterAttributeResponse);
     send_verification_code: (SendVerificationCodeArgs) -> (SendVerificationCodeResponse);
     confirm_verification_code: (ConfirmVerificationCodeArgs) -> (ConfirmVerificationCodeResponse);
+
+    // Called by an app to get the view of the profile visible to the given app
+    app_profile_view: (AppProfileViewArgs) -> (AppProfileViewResponse) query;
 
     //// Verification code sender
     ext_verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse);
