@@ -6,6 +6,7 @@ import type {
     ApiPhoneFacet,
     ApiPhoneNumber,
     ApiProfileResponse,
+    ApiRegisterEmailResponse,
     ApiRegisterPhoneNumberResponse,
     ApiSendVerificationCodeResponse,
     ApiVerificationCodeStatus,
@@ -22,6 +23,7 @@ import {
     RegisterPhoneResponse,
     SendCodeResponse,
     ConfirmCodeResponse,
+    RegisterEmailResponse,
 } from "../../domain/identity/identity";
 import { UnsupportedValueError } from "../../utils/error";
 
@@ -75,6 +77,26 @@ export function sendCodeResponse(candid: ApiSendVerificationCodeResponse): SendC
         "Unexpected send verification code response type returned",
         candid
     );
+}
+
+export function registerEmailResponse(candid: ApiRegisterEmailResponse): RegisterEmailResponse {
+    if ("Success" in candid) {
+        return {
+            kind: "register_email_success",
+            id: candid.Success.attribute_id,
+        };
+    }
+    if ("AlreadyRegistered" in candid) {
+        return {
+            kind: "register_email_already_registered",
+        };
+    }
+    if ("InvalidEmailAddress" in candid) {
+        return {
+            kind: "register_email_invalid",
+        };
+    }
+    throw new UnsupportedValueError("Unexpected register phone response type returned", candid);
 }
 
 export function registerPhoneResponse(

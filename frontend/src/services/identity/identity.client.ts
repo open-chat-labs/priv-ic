@@ -6,9 +6,16 @@ import type {
     Profile,
     RegisterPhoneResponse,
     SendCodeResponse,
+    RegisterEmailResponse,
 } from "../../domain/identity/identity";
 import { CandidService } from "../candidService";
-import { confirmCodeResponse, profile, registerPhoneResponse, sendCodeResponse } from "./mappers";
+import {
+    confirmCodeResponse,
+    profile,
+    registerEmailResponse,
+    registerPhoneResponse,
+    sendCodeResponse,
+} from "./mappers";
 import type { IIdentityClient } from "./identity.client.interface";
 import { IdentityClientMock } from "./identity.client.mock";
 
@@ -40,6 +47,14 @@ export class IdentityClient extends CandidService implements IIdentityClient {
                 },
             }),
             registerPhoneResponse
+        );
+    }
+    registerEmailAddress(address: string): Promise<RegisterEmailResponse> {
+        return this.handleResponse(
+            this.identityService.register_email({
+                email_address: address,
+            }),
+            registerEmailResponse
         );
     }
     sendVerificationCode(id: bigint): Promise<SendCodeResponse> {

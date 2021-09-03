@@ -1,13 +1,18 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import PlusCircleOutline from "svelte-material-icons/PlusCircleOutline.svelte";
-    import { addPhoneNumber, removePhoneNumber } from "../domain/identity/identity";
+    import {
+        addPhoneNumber,
+        removePhoneNumber,
+        addEmailAddress,
+    } from "../domain/identity/identity";
     import type { PhoneNumber, Profile, Verifiable } from "../domain/identity/identity";
 
     import type { ServiceContainer } from "../services/serviceContainer";
     import HoverIcon from "./HoverIcon.svelte";
     import Loading from "./Loading.svelte";
     import NewPhoneNumber from "./NewPhoneNumber.svelte";
+    import NewEmailAddress from "./NewEmailAddress.svelte";
     import RegisteredPhoneNumber from "./RegisteredPhoneNumber.svelte";
 
     export let serviceContainer: ServiceContainer;
@@ -26,11 +31,14 @@
         addingPhoneNumber = false;
     }
 
-    function unregister(ev: CustomEvent<bigint>) {
-        profile = removePhoneNumber(profile, ev.detail);
+    function registeredEmailAddress(ev: CustomEvent<Verifiable<string>>) {
+        profile = addEmailAddress(profile, ev.detail);
+        addingEmail = false;
     }
 
-    function addEmailAddress() {}
+    function unregisterPhone(ev: CustomEvent<bigint>) {
+        profile = removePhoneNumber(profile, ev.detail);
+    }
 </script>
 
 <main class="main">
@@ -69,7 +77,7 @@
                     {:else}
                         {#each profile.identity.phone.numbers as phoneNumber}
                             <RegisteredPhoneNumber
-                                on:unregistered={unregister}
+                                on:unregistered={unregisterPhone}
                                 {phoneNumber}
                                 {serviceContainer} />
                         {/each}
@@ -79,7 +87,7 @@
             <section class="box">
                 <div class="section-header">
                     <h5 class="section-title">Email addresses</h5>
-                    <div class="icon" on:click={addEmailAddress}>
+                    <div class="icon" on:click={() => (addingEmail = true)}>
                         <HoverIcon>
                             <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
                         </HoverIcon>
@@ -87,7 +95,9 @@
                 </div>
                 <div class="section-body">
                     {#if addingEmail}
-                        <p>adding a new email</p>
+                        <NewEmailAddress
+                            on:registeredEmailAddress={registeredEmailAddress}
+                            {serviceContainer} />
                     {/if}
                     {#if profile.identity.email.addresses.length === 0 && !addingEmail}
                         <p class="advice">Click the button above to register a new email address</p>

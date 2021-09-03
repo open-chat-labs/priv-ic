@@ -6,6 +6,30 @@ export const nullProfile: Profile = {
     apps: [],
 };
 
+export function addEmailAddress(profile: Profile, address: Verifiable<string>): Profile {
+    return {
+        ...profile,
+        identity: {
+            ...profile.identity,
+            email: {
+                addresses: [address, ...profile.identity.email.addresses],
+            },
+        },
+    };
+}
+
+export function removeEmailAddress(profile: Profile, id: bigint): Profile {
+    return {
+        ...profile,
+        identity: {
+            ...profile.identity,
+            email: {
+                addresses: profile.identity.email.addresses.filter((n) => n.id !== id),
+            },
+        },
+    };
+}
+
 export function addPhoneNumber(profile: Profile, phoneNumber: Verifiable<PhoneNumber>): Profile {
     return {
         ...profile,
@@ -65,6 +89,24 @@ export type Verifiable<T> = {
 };
 
 export type VerificationCodeStatus = "pending" | "sent" | "verified" | "expired";
+
+export type RegisterEmailResponse =
+    | RegisterEmailSuccess
+    | RegisterEmailAlreadyRegistered
+    | RegisterEmailInvalid;
+
+export type RegisterEmailSuccess = {
+    kind: "register_email_success";
+    id: bigint;
+};
+
+export type RegisterEmailAlreadyRegistered = {
+    kind: "register_email_already_registered";
+};
+
+export type RegisterEmailInvalid = {
+    kind: "register_email_invalid";
+};
 
 export type RegisterPhoneResponse =
     | RegisterPhoneSuccess

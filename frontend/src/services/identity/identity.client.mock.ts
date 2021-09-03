@@ -6,6 +6,7 @@ import {
     RegisterPhoneResponse,
     SendCodeResponse,
     ConfirmCodeResponse,
+    RegisterEmailResponse,
 } from "../../domain/identity/identity";
 import type { IIdentityClient } from "./identity.client.interface";
 import { v1 as uuidv1 } from "uuid";
@@ -27,6 +28,18 @@ export class IdentityClientMock implements IIdentityClient {
         return new Promise((res) => {
             setTimeout(() => {
                 res("success");
+            }, 1000);
+        });
+    }
+
+    registerEmailAddress(_address: string): Promise<RegisterEmailResponse> {
+        console.log("Registering phone number");
+        return new Promise((res) => {
+            setTimeout(() => {
+                res({
+                    kind: "register_email_success",
+                    id: newFieldId(),
+                });
             }, 1000);
         });
     }
