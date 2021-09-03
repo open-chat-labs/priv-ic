@@ -91,6 +91,7 @@
         height: 40px;
         margin-right: $sp3;
         min-width: 120px;
+        @include font(book, normal, fs-80);
     }
 
     :global(.phone-number .input-wrapper input) {
@@ -124,5 +125,6 @@
     .actions {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
     }
 </style>
