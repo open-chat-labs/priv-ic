@@ -21,14 +21,14 @@ pub async fn run(
             if let Err(err) =
                 send_codes::run(code_reader, index_store, sms_sender, email_sender).await
             {
-                error!("push notifications failed: {:?}", err);
+                error!("push verification codes failed: {:?}", err);
             }
 
             interval.tick().await;
         }
 
         if let Err(err) = remove_codes::run(code_reader, index_store).await {
-            error!("prune notifications failed: {:?}", err);
+            error!("remove verification codes failed: {:?}", err);
         }
     }
 }
