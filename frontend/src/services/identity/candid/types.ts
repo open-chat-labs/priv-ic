@@ -19,7 +19,7 @@ export interface AppProfileViewSuccessResult {
 }
 export interface ConfirmVerificationCodeArgs {
   'verification_code' : string,
-  'field_id' : FieldId,
+  'attribute_id' : AttributeId,
 }
 export type ConfirmVerificationCodeResponse = { 'NotSent' : null } |
   { 'AlreadyConfirmed' : null } |
@@ -28,7 +28,7 @@ export type ConfirmVerificationCodeResponse = { 'NotSent' : null } |
   { 'ConfirmationCodeExpired' : null } |
   { 'ConfirmationCodeIncorrect' : null };
 export interface EmailFacet { 'addresses' : Array<VerifiableEmailAddress> }
-export type FieldId = bigint;
+export type AttributeId = bigint;
 export interface Identity { 'email' : EmailFacet, 'phone' : PhoneFacet }
 export interface InitArgs {
   'verification_code_sender_principals' : Array<Principal>,
@@ -42,7 +42,7 @@ export interface ProfileSuccessResult {
   'apps' : Array<App>,
   'identity' : Identity,
 }
-export interface RegisterEmailAddressSuccessResult { 'field_id' : FieldId }
+export interface RegisterEmailAddressSuccessResult { 'attribute_id' : AttributeId }
 export interface RegisterEmailArgs { 'email_address' : string }
 export type RegisterEmailResponse = { 'AlreadyRegistered' : null } |
   { 'Success' : RegisterEmailAddressSuccessResult } |
@@ -51,28 +51,28 @@ export interface RegisterPhoneNumberArgs { 'phone_number' : PhoneNumber }
 export type RegisterPhoneNumberResponse = { 'AlreadyRegistered' : null } |
   { 'Success' : RegisterPhoneNumberSuccessResult } |
   { 'InvalidPhoneNumber' : null };
-export interface RegisterPhoneNumberSuccessResult { 'field_id' : FieldId }
+export interface RegisterPhoneNumberSuccessResult { 'attribute_id' : AttributeId }
 export interface RemoveVerificationCodesArgs { 'up_to_index' : bigint }
 export type RemoveVerificationCodesResponse = { 'NotAuthorized' : null } |
   { 'Success' : null };
-export interface SendVerificationCodeArgs { 'field_id' : FieldId }
+export interface SendVerificationCodeArgs { 'attribute_id' : AttributeId }
 export type SendVerificationCodeResponse = { 'NotFound' : null } |
   { 'Success' : null } |
   { 'AlreadySent' : null };
-export interface SetVisibleProfileFieldsArgs {
-  'fields' : Array<FieldId>,
+export interface SetVisibleProfileAttributesArgs {
+  'attributes' : Array<AttributeId>,
   'app_domain_name' : string,
 }
-export type SetVisibleProfileFieldsResponse = ;
+export type SetVisibleProfileAttributesResponse = ;
 export type TimestampMillis = bigint;
 export interface VerifiableEmailAddress {
-  'id' : FieldId,
+  'id' : AttributeId,
   'status' : VerificationCodeStatus,
   'added' : TimestampMillis,
   'value' : string,
 }
 export interface VerifiablePhoneNumber {
-  'id' : FieldId,
+  'id' : AttributeId,
   'status' : VerificationCodeStatus,
   'added' : TimestampMillis,
   'value' : PhoneNumber,
@@ -98,10 +98,10 @@ export type VerificationCodesResponse = { 'NotAuthorized' : null } |
 export interface VerificationCodesSuccessResult {
   'verification_codes' : Array<VerificationCode>,
 }
-export interface VisibleProfileFieldsArgs { 'app_domain_name' : string }
-export type VisibleProfileFieldsResponse = { 'NotFound' : null } |
-  { 'Success' : VisibleProfileFieldsSuccessResult };
-export interface VisibleProfileFieldsSuccessResult { 'fields' : Array<FieldId> }
+export interface VisibleProfileAttributesArgs { 'app_domain_name' : string }
+export type VisibleProfileAttributesResponse = { 'NotFound' : null } |
+  { 'Success' : VisibleProfileAttributesSuccessResult };
+export interface VisibleProfileAttributesSuccessResult { 'attributes' : Array<AttributeId> }
 export interface _SERVICE {
   'app_profile_view' : (arg_0: AppProfileViewArgs) => Promise<
       AppProfileViewResponse
@@ -125,10 +125,10 @@ export interface _SERVICE {
   'send_verification_code' : (arg_0: SendVerificationCodeArgs) => Promise<
       SendVerificationCodeResponse
     >,
-  'set_visible_profile_fields' : (
-      arg_0: SetVisibleProfileFieldsArgs,
-    ) => Promise<SetVisibleProfileFieldsResponse>,
-  'visible_profile_fields' : (arg_0: VisibleProfileFieldsArgs) => Promise<
-      VisibleProfileFieldsResponse
+  'set_visible_profile_attributes' : (
+      arg_0: SetVisibleProfileAttributesArgs,
+    ) => Promise<SetVisibleProfileAttributesResponse>,
+  'visible_profile_attributes' : (arg_0: VisibleProfileAttributesArgs) => Promise<
+      VisibleProfileAttributesResponse
     >,
 }

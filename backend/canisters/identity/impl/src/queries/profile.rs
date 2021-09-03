@@ -26,15 +26,15 @@ fn chunk_impl(runtime_state: &RuntimeState) -> Response {
 }
 
 fn map_identity(identity: &identity::Identity, now: TimestampMillis) -> Identity {
-    fn map_verifiable_field<T: CandidType + Clone>(
-        field: &identity::VerifiableField<T>,
+    fn map_verifiable_attribute<T: CandidType + Clone>(
+        attribute: &identity::VerifiableAttribute<T>,
         now: TimestampMillis,
-    ) -> VerifiableField<T> {
-        VerifiableField::<T> {
-            id: field.id,
-            added: field.added,
-            value: field.value.clone(),
-            status: match &field.status {
+    ) -> VerifiableAttribute<T> {
+        VerifiableAttribute::<T> {
+            id: attribute.id,
+            added: attribute.added,
+            value: attribute.value.clone(),
+            status: match &attribute.status {
                 identity::VerificationCodeStatus::Pending => VerificationCodeStatus::Pending,
                 identity::VerificationCodeStatus::Sent(s) => {
                     if s.date < now + VERIFICATION_CODE_EXPIRY_MILLIS {
@@ -55,14 +55,14 @@ fn map_identity(identity: &identity::Identity, now: TimestampMillis) -> Identity
             addresses: identity
                 .email_addresses
                 .iter()
-                .map(|e| map_verifiable_field(e, now))
+                .map(|e| map_verifiable_attribute(e, now))
                 .collect(),
         },
         phone: PhoneFacet {
             numbers: identity
                 .phone_numbers
                 .iter()
-                .map(|e| map_verifiable_field(e, now))
+                .map(|e| map_verifiable_attribute(e, now))
                 .collect(),
         },
     }

@@ -1,6 +1,6 @@
 use candid::CandidType;
 use serde::Deserialize;
-use types::{App, FieldId, PhoneNumber, TimestampMillis};
+use types::{App, AttributeId, PhoneNumber, TimestampMillis};
 
 #[derive(CandidType, Deserialize, Debug)]
 pub struct Args {}
@@ -25,17 +25,17 @@ pub struct Identity {
 
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
 pub struct EmailFacet {
-    pub addresses: Vec<VerifiableField<String>>,
+    pub addresses: Vec<VerifiableAttribute<String>>,
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug, Default)]
 pub struct PhoneFacet {
-    pub numbers: Vec<VerifiableField<PhoneNumber>>,
+    pub numbers: Vec<VerifiableAttribute<PhoneNumber>>,
 }
 
 #[derive(CandidType, Deserialize, Clone, Debug)]
-pub struct VerifiableField<T: CandidType + Clone> {
-    pub id: FieldId,
+pub struct VerifiableAttribute<T: CandidType + Clone> {
+    pub id: AttributeId,
     pub status: VerificationCodeStatus,
     pub added: TimestampMillis,
     pub value: T,

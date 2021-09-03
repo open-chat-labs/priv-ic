@@ -1,4 +1,4 @@
-type FieldId = nat;
+type AttributeId = nat;
 type TimestampMillis = nat64;
 
 type App =
@@ -38,7 +38,7 @@ type VerificationCodeStatus =
 
 type VerifiableEmailAddress =
     record {
-        id: FieldId;
+        id: AttributeId;
         status: VerificationCodeStatus;
         added: TimestampMillis;
         value: text;
@@ -46,7 +46,7 @@ type VerifiableEmailAddress =
 
 type VerifiablePhoneNumber =
     record {
-        id: FieldId;
+        id: AttributeId;
         status: VerificationCodeStatus;
         added: TimestampMillis;
         value: PhoneNumber;

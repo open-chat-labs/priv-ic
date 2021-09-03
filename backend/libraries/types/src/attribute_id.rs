@@ -16,16 +16,16 @@ use uuid::Uuid;
     Ord,
     Hash,
 )]
-pub struct FieldId(u128);
+pub struct AttributeId(u128);
 
-impl From<u128> for FieldId {
-    fn from(value: u128) -> FieldId {
-        FieldId(value)
+impl From<u128> for AttributeId {
+    fn from(value: u128) -> AttributeId {
+        AttributeId(value)
     }
 }
 
-impl FieldId {
-    pub fn new() -> FieldId {
-        FieldId(Uuid::new_v4().as_u128())
+impl AttributeId {
+    pub fn new() -> AttributeId {
+        AttributeId(Uuid::new_v4().as_u128())
     }
 }

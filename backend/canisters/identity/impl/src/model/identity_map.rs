@@ -1,10 +1,10 @@
 use crate::model::identity::Identity;
-use crate::model::identity::{VerifiableField, VerificationCodeStatus};
+use crate::model::identity::{VerifiableAttribute, VerificationCodeStatus};
 use candid::Principal;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::HashMap;
 use std::collections::HashSet;
-use types::{FieldId, PhoneNumber, TimestampMillis};
+use types::{AttributeId, PhoneNumber, TimestampMillis};
 
 #[derive(Default)]
 pub struct IdentityMap {
@@ -24,7 +24,7 @@ impl IdentityMap {
         principal: Principal,
         phone_number: PhoneNumber,
         now: TimestampMillis,
-    ) -> Option<FieldId> {
+    ) -> Option<AttributeId> {
         if self.registered_phone_numbers.contains(&phone_number) {
             return None;
         }
@@ -34,15 +34,15 @@ impl IdentityMap {
             Vacant(e) => e.insert(Identity::default()),
         };
 
-        let id = FieldId::new();
-        let field = VerifiableField::<PhoneNumber> {
+        let id = AttributeId::new();
+        let attribute = VerifiableAttribute::<PhoneNumber> {
             id,
             status: VerificationCodeStatus::Pending,
             added: now,
             value: phone_number.clone(),
         };
 
-        identity.phone_numbers.push(field);
+        identity.phone_numbers.push(attribute);
         self.registered_phone_numbers.insert(phone_number);
 
         Some(id)
