@@ -70,7 +70,7 @@ type RegisterPhoneNumberResponse =
         InvalidPhoneNumber;
     };
 
-type RegisterPhoneNumberSuccessResult
+type RegisterPhoneNumberSuccessResult =
     record {
         field_id: FieldId;
     };
@@ -87,7 +87,7 @@ type RegisterEmailResponse =
         InvalidEmailAddress;
     };
 
-type RegisterEmailAddressSuccessResult
+type RegisterEmailAddressSuccessResult =
     record {
         field_id: FieldId;
     };
@@ -127,7 +127,7 @@ type VerificationCodesArgs =
 
 type VerificationCodesResponse =
     variant {
-        Success(VerificationCodesSuccessResult);
+        Success: VerificationCodesSuccessResult;
         NotAuthorized;
     };
 

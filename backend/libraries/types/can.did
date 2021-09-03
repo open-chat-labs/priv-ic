@@ -1,4 +1,5 @@
 type FieldId = nat;
+type TimestampMillis = nat64;
 
 type App =
     record {

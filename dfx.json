@@ -1,0 +1,33 @@
+{
+  "canisters": {
+    "identity": {
+      "type": "custom",
+      "candid": "backend/canisters/identity/api/can.did",
+      "wasm": "target/wasm32-unknown-unknown/release/identity_canister_impl-opt.wasm",
+      "build": "./generate-wasm.sh identity_canister_impl"
+    },
+    "website": {
+      "frontend": {
+        "entrypoint": "frontend/public/index.html"
+      },
+      "source": ["frontend/public"],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    },
+    "ic": {
+      "bind": "https://ic0.app/",
+      "type": "persistent"
+    }
+  },
+  "version": 1
+}

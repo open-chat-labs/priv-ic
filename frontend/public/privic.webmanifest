@@ -1,0 +1,21 @@
+{
+    "background_color": "#22A7F2",
+    "description": "PrivIC",
+    "display": "fullscreen",
+    "icons": [
+        {
+            "src": "apple-touch-icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "logo-icon.svg",
+            "purpose": "maskable any",
+            "type": "image/svg+xml",
+            "sizes": "48x48 72x72 96x96 128x128 150x150 256x256 512x512 1024x1024"
+        }
+    ],
+    "name": "PrivIC",
+    "short_name": "PrivIC",
+    "start_url": "/"
+}
