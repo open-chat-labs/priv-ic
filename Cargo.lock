@@ -164,6 +164,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-sdk-ses"
+version = "0.0.16-alpha"
+source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.16-alpha#dab3b0a97d8213105549f35914670dd7bd91d619"
+dependencies = [
+ "aws-auth",
+ "aws-endpoint",
+ "aws-http",
+ "aws-hyper",
+ "aws-sig-auth",
+ "aws-types",
+ "bytes",
+ "http",
+ "smithy-http",
+ "smithy-query",
+ "smithy-types",
+ "smithy-xml",
+]
+
+[[package]]
 name = "aws-sdk-sns"
 version = "0.0.16-alpha"
 source = "git+https://github.com/awslabs/aws-sdk-rust?tag=v0.0.16-alpha#dab3b0a97d8213105549f35914670dd7bd91d619"
@@ -2489,6 +2508,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "aws-sdk-dynamodb",
+ "aws-sdk-ses",
  "aws-sdk-sns",
  "candid",
  "dotenv",
