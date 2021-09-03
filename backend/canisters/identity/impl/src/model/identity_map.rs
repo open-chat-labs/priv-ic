@@ -1,12 +1,10 @@
+use crate::model::identity::Identity;
+use crate::model::identity::{VerifiableField, VerificationCodeStatus};
 use candid::Principal;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::HashMap;
 use std::collections::HashSet;
-use types::Identity;
-use types::TimestampMillis;
-use types::VerifiableField;
-use types::VerificationCodeStatus;
-use types::{FieldId, PhoneNumber};
+use types::{FieldId, PhoneNumber, TimestampMillis};
 
 #[derive(Default)]
 pub struct IdentityMap {
@@ -44,7 +42,7 @@ impl IdentityMap {
             value: phone_number.clone(),
         };
 
-        identity.phone.numbers.push(field);
+        identity.phone_numbers.push(field);
         self.registered_phone_numbers.insert(phone_number);
 
         Some(id)
