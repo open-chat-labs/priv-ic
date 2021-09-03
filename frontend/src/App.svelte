@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { getIdentity } from "./services/auth";
 
     // import Login from "./components/Login.svelte";
     // const Register = () => import("./components/register/Register.controller.svelte");
@@ -11,6 +12,9 @@
 
     onMount(() => {
         calculateHeight();
+        getIdentity().then((id) => {
+            console.log(id);
+        });
     });
 
     function calculateHeight() {
