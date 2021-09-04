@@ -3,7 +3,7 @@ use candid::Principal;
 use std::cell::RefCell;
 use std::collections::HashSet;
 use types::VerificationCode;
-use utils::env::Environment;
+use utils::env::{EmptyEnvironment, Environment};
 use utils::event_stream::EventStream;
 
 mod lifecycle;
@@ -14,7 +14,7 @@ mod updates;
 pub const CONFIRMATION_CODE_EXPIRY_MILLIS: u64 = 60 * 60 * 1000; // 1 hour
 
 thread_local! {
-    pub static RUNTIME_STATE: RefCell<Option<RuntimeState>> = RefCell::default();
+    pub static RUNTIME_STATE: RefCell<RuntimeState> = RefCell::default();
 }
 
 pub struct RuntimeState {
@@ -34,6 +34,16 @@ impl RuntimeState {
     }
 }
 
+impl Default for RuntimeState {
+    fn default() -> Self {
+        RuntimeState {
+            env: Box::new(EmptyEnvironment {}),
+            data: Data::default(),
+        }
+    }
+}
+
+#[derive(Default)]
 pub struct Data {
     pub verification_code_sender_principals: HashSet<Principal>,
     pub identities: IdentityMap,

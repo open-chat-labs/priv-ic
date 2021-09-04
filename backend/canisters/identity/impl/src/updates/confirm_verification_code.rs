@@ -5,8 +5,7 @@ use identity_canister_api::confirm_verification_code::{Response::*, *};
 
 #[update]
 fn confirm_verification_code(args: Args) -> Response {
-    RUNTIME_STATE
-        .with(|state| confirm_verification_code_impl(args, state.borrow_mut().as_mut().unwrap()))
+    RUNTIME_STATE.with(|state| confirm_verification_code_impl(args, &mut state.borrow_mut()))
 }
 
 fn confirm_verification_code_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {

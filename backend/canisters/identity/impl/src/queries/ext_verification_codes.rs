@@ -6,7 +6,7 @@ const MAX_VERIFICATION_CODES_PER_BATCH: u32 = 100;
 
 #[query]
 fn ext_verification_codes(args: Args) -> Response {
-    RUNTIME_STATE.with(|state| ext_verification_codes_impl(args, state.borrow().as_ref().unwrap()))
+    RUNTIME_STATE.with(|state| ext_verification_codes_impl(args, &state.borrow()))
 }
 
 fn ext_verification_codes_impl(args: Args, runtime_state: &RuntimeState) -> Response {

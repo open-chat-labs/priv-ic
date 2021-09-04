@@ -9,7 +9,7 @@ use types::TimestampMillis;
 
 #[query]
 fn chunk(_args: Args) -> Response {
-    RUNTIME_STATE.with(|state| chunk_impl(state.borrow().as_ref().unwrap()))
+    RUNTIME_STATE.with(|state| chunk_impl(&state.borrow()))
 }
 
 fn chunk_impl(runtime_state: &RuntimeState) -> Response {
