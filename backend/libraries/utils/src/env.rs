@@ -16,22 +16,22 @@ pub struct EmptyEnvironment {}
 
 impl Environment for EmptyEnvironment {
     fn now(&self) -> u64 {
-        todo!()
+        unimplemented!()
     }
 
     fn caller(&self) -> Principal {
-        todo!()
+        unimplemented!()
     }
 
     fn canister_id(&self) -> CanisterId {
-        todo!()
+        unimplemented!()
     }
 
     fn random_u32(&mut self) -> u32 {
-        todo!()
+        unimplemented!()
     }
 
     fn test_mode(&self) -> bool {
-        todo!()
+        unimplemented!()
     }
 }
