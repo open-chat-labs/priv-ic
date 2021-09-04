@@ -33,12 +33,13 @@ export const idlFactory = ({ IDL }) => {
     'verification_code' : IDL.Text,
   });
   const ConfirmVerificationCodeResponse = IDL.Variant({
-    'NotSent' : IDL.Null,
-    'AlreadyConfirmed' : IDL.Null,
-    'NotFound' : IDL.Null,
+    'AttributeNotFound' : IDL.Null,
+    'VerificationCodeIncorrect' : IDL.Null,
     'Success' : IDL.Null,
-    'ConfirmationCodeExpired' : IDL.Null,
-    'ConfirmationCodeIncorrect' : IDL.Null,
+    'AlreadyVerified' : IDL.Null,
+    'VerificationCodeExpired' : IDL.Null,
+    'IdentityNotFound' : IDL.Null,
+    'VerificationCodeInvalid' : IDL.Null,
   });
   const RemoveVerificationCodesArgs = IDL.Record({ 'up_to_index' : IDL.Nat64 });
   const RemoveVerificationCodesResponse = IDL.Variant({
@@ -72,7 +73,6 @@ export const idlFactory = ({ IDL }) => {
     'Sent' : TimestampMillis,
     'Verified' : TimestampMillis,
     'Expired' : TimestampMillis,
-    'Pending' : IDL.Null,
   });
   const VerifiableEmailAddress = IDL.Record({
     'id' : AttributeId,
@@ -103,23 +103,18 @@ export const idlFactory = ({ IDL }) => {
     'NotFound' : IDL.Null,
     'Success' : ProfileSuccessResult,
   });
-  const RegisterEmailArgs = IDL.Record({ 'email_address' : IDL.Text });
-  const RegisterEmailAddressSuccessResult = IDL.Record({
+  const AttributeValue = IDL.Variant({
+    'Email' : IDL.Text,
+    'Phone' : PhoneNumber,
+  });
+  const RegisterAttributeArgs = IDL.Record({ 'value' : AttributeValue });
+  const RegisterAttributeSuccessResult = IDL.Record({
     'attribute_id' : AttributeId,
   });
-  const RegisterEmailResponse = IDL.Variant({
+  const RegisterAttributeResponse = IDL.Variant({
     'AlreadyRegistered' : IDL.Null,
-    'Success' : RegisterEmailAddressSuccessResult,
-    'InvalidEmailAddress' : IDL.Null,
-  });
-  const RegisterPhoneNumberArgs = IDL.Record({ 'phone_number' : PhoneNumber });
-  const RegisterPhoneNumberSuccessResult = IDL.Record({
-    'attribute_id' : AttributeId,
-  });
-  const RegisterPhoneNumberResponse = IDL.Variant({
-    'AlreadyRegistered' : IDL.Null,
-    'Success' : RegisterPhoneNumberSuccessResult,
-    'InvalidPhoneNumber' : IDL.Null,
+    'Success' : RegisterAttributeSuccessResult,
+    'InvalidValue' : IDL.Null,
   });
   const SendVerificationCodeArgs = IDL.Record({ 'attribute_id' : AttributeId });
   const SendVerificationCodeResponse = IDL.Variant({
@@ -169,14 +164,9 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'profile' : IDL.Func([ProfileArgs], [ProfileResponse], ['query']),
-    'register_email' : IDL.Func(
-        [RegisterEmailArgs],
-        [RegisterEmailResponse],
-        [],
-      ),
-    'register_phone_number' : IDL.Func(
-        [RegisterPhoneNumberArgs],
-        [RegisterPhoneNumberResponse],
+    'register_attribute' : IDL.Func(
+        [RegisterAttributeArgs],
+        [RegisterAttributeResponse],
         [],
       ),
     'send_verification_code' : IDL.Func(

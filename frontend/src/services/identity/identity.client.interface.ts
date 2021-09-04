@@ -2,16 +2,15 @@ import type {
     ConfirmCodeResponse,
     PhoneNumber,
     Profile,
-    RegisterEmailResponse,
-    RegisterPhoneResponse,
+    RegisterAttributeResponse,
     SendCodeResponse,
     VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 
 export interface IIdentityClient {
     getProfile(): Promise<Profile>;
-    registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterPhoneResponse>;
-    registerEmailAddress(address: string): Promise<RegisterEmailResponse>;
+    registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse>;
+    registerEmailAddress(address: string): Promise<RegisterAttributeResponse>;
     sendVerificationCode(id: bigint): Promise<SendCodeResponse>;
     confirmVerificationCode(id: bigint, code: string): Promise<ConfirmCodeResponse>;
     visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse>;

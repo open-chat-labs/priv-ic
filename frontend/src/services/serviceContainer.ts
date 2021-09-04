@@ -3,8 +3,7 @@ import type {
     ConfirmCodeResponse,
     PhoneNumber,
     Profile,
-    RegisterEmailResponse,
-    RegisterPhoneResponse,
+    RegisterAttributeResponse,
     SendCodeResponse,
     VisibleProfileAttributesResponse,
 } from "../domain/identity/identity";
@@ -22,11 +21,11 @@ export class ServiceContainer {
         return this._identityClient.getProfile();
     }
 
-    registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterPhoneResponse> {
+    registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse> {
         return this._identityClient.registerPhoneNumber(phoneNumber);
     }
 
-    registerEmailAddress(address: string): Promise<RegisterEmailResponse> {
+    registerEmailAddress(address: string): Promise<RegisterAttributeResponse> {
         return this._identityClient.registerEmailAddress(address);
     }
 

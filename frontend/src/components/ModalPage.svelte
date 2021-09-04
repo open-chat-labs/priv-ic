@@ -1,6 +1,6 @@
 <script lang="ts">
     export let minHeight: string | undefined = undefined;
-    export let bgClass: "locked" = "locked";
+    export let bgClass: "locked" | "quiet" = "locked";
 </script>
 
 <div class={`modal-page ${bgClass}`}>
@@ -17,6 +17,10 @@
 
         &.locked {
             @include fullScreenImg("../assets/locked.jpg");
+        }
+
+        &.quiet {
+            @include fullScreenImg("../assets/quiet.jpg");
         }
 
         @include fullHeight();

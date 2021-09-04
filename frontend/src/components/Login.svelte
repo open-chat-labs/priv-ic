@@ -6,7 +6,7 @@
     export let loading: boolean = false;
 </script>
 
-<ModalPage>
+<ModalPage bgClass="quiet">
     <h4 class="subtitle">Login required ...</h4>
     <h1 class="title">Login to PrivIC</h1>
     <p class="blurb">

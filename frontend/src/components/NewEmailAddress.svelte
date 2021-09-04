@@ -16,7 +16,7 @@
         serviceContainer
             .registerEmailAddress(emailAddress)
             .then((resp) => {
-                if (resp.kind === "register_email_success") {
+                if (resp.kind === "register_attribute_success") {
                     dispatch("registeredEmailAddress", {
                         id: resp.id,
                         status: "pending",

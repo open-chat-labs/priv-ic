@@ -96,40 +96,22 @@ export type Verifiable<T> = {
 
 export type VerificationCodeStatus = "pending" | "sent" | "verified" | "expired";
 
-export type RegisterEmailResponse =
-    | RegisterEmailSuccess
-    | RegisterEmailAlreadyRegistered
-    | RegisterEmailInvalid;
+export type RegisterAttributeResponse =
+    | RegisterAttributeSuccess
+    | RegisterAttributeAlreadyRegistered
+    | RegisterAttributeInvalid;
 
-export type RegisterEmailSuccess = {
-    kind: "register_email_success";
+export type RegisterAttributeSuccess = {
+    kind: "register_attribute_success";
     id: bigint;
 };
 
-export type RegisterEmailAlreadyRegistered = {
-    kind: "register_email_already_registered";
+export type RegisterAttributeAlreadyRegistered = {
+    kind: "register_attribute_already_registered";
 };
 
-export type RegisterEmailInvalid = {
-    kind: "register_email_invalid";
-};
-
-export type RegisterPhoneResponse =
-    | RegisterPhoneSuccess
-    | RegisterPhoneAlreadyRegistered
-    | RegisterPhoneInvalid;
-
-export type RegisterPhoneSuccess = {
-    kind: "register_phone_success";
-    id: bigint;
-};
-
-export type RegisterPhoneAlreadyRegistered = {
-    kind: "register_phone_already_registered";
-};
-
-export type RegisterPhoneInvalid = {
-    kind: "register_phone_invalid";
+export type RegisterAttributeInvalid = {
+    kind: "register_attribute_invalid";
 };
 
 export type SendCodeResponse =
@@ -143,9 +125,11 @@ export type SendCodeResponse =
 export type ConfirmCodeResponse =
     | "success"
     | "code_incorrect"
+    | "code_invalid"
     | "code_expired"
-    | "already_confirmed"
+    | "already_verified"
     | "not_sent"
-    | "not_found";
+    | "identity_not_found"
+    | "attribute_not_found";
 
 export type VisibleProfileAttributesResponse = "not_found" | bigint[];

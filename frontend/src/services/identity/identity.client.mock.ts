@@ -3,10 +3,9 @@ import {
     PhoneNumber,
     addPhoneNumber,
     Profile,
-    RegisterPhoneResponse,
+    RegisterAttributeResponse,
     SendCodeResponse,
     ConfirmCodeResponse,
-    RegisterEmailResponse,
     addEmailAddress,
     VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
@@ -38,24 +37,24 @@ export class IdentityClientMock implements IIdentityClient {
         });
     }
 
-    registerEmailAddress(_address: string): Promise<RegisterEmailResponse> {
+    registerEmailAddress(_address: string): Promise<RegisterAttributeResponse> {
         console.log("Registering phone number");
         return new Promise((res) => {
             setTimeout(() => {
                 res({
-                    kind: "register_email_success",
+                    kind: "register_attribute_success",
                     id: newFieldId(),
                 });
             }, 1000);
         });
     }
 
-    registerPhoneNumber(_phoneNumber: PhoneNumber): Promise<RegisterPhoneResponse> {
+    registerPhoneNumber(_phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse> {
         console.log("Registering phone number");
         return new Promise((res) => {
             setTimeout(() => {
                 res({
-                    kind: "register_phone_success",
+                    kind: "register_attribute_success",
                     id: newFieldId(),
                 });
             }, 1000);

@@ -6,8 +6,7 @@ import type {
     ApiPhoneFacet,
     ApiPhoneNumber,
     ApiProfileResponse,
-    ApiRegisterEmailResponse,
-    ApiRegisterPhoneNumberResponse,
+    ApiRegisterAttributeResponse,
     ApiSendVerificationCodeResponse,
     ApiVerificationCodeStatus,
     ApiVisibleProfileAttributesResponse,
@@ -21,10 +20,9 @@ import {
     PhoneFacet,
     VerificationCodeStatus,
     PhoneNumber,
-    RegisterPhoneResponse,
+    RegisterAttributeResponse,
     SendCodeResponse,
     ConfirmCodeResponse,
-    RegisterEmailResponse,
     VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import { UnsupportedValueError } from "../../utils/error";
@@ -55,17 +53,23 @@ export function confirmCodeResponse(
     if ("NotSent" in candid) {
         return "not_sent";
     }
-    if ("NotFound" in candid) {
-        return "not_found";
+    if ("IdentityNotFound" in candid) {
+        return "identity_not_found";
     }
-    if ("AlreadyConfirmed" in candid) {
-        return "already_confirmed";
+    if ("AttributeNotFound" in candid) {
+        return "attribute_not_found";
     }
-    if ("ConfirmationCodeExpired" in candid) {
+    if ("AlreadyVerified" in candid) {
+        return "already_verified";
+    }
+    if ("VerificationCodeExpired" in candid) {
         return "code_expired";
     }
-    if ("ConfirmationCodeIncorrect" in candid) {
+    if ("VerificationCodeIncorrect" in candid) {
         return "code_incorrect";
+    }
+    if ("VerificationCodeInvalid" in candid) {
+        return "code_invalid";
     }
     throw new UnsupportedValueError(
         "Unexpected confirm verification code response type returned",
@@ -98,46 +102,26 @@ export function sendCodeResponse(candid: ApiSendVerificationCodeResponse): SendC
     );
 }
 
-export function registerEmailResponse(candid: ApiRegisterEmailResponse): RegisterEmailResponse {
+export function registerAttributeResponse(
+    candid: ApiRegisterAttributeResponse
+): RegisterAttributeResponse {
     if ("Success" in candid) {
         return {
-            kind: "register_email_success",
+            kind: "register_attribute_success",
             id: candid.Success.attribute_id,
         };
     }
     if ("AlreadyRegistered" in candid) {
         return {
-            kind: "register_email_already_registered",
+            kind: "register_attribute_already_registered",
         };
     }
-    if ("InvalidEmailAddress" in candid) {
+    if ("InvalidValue" in candid) {
         return {
-            kind: "register_email_invalid",
+            kind: "register_attribute_invalid",
         };
     }
-    throw new UnsupportedValueError("Unexpected register phone response type returned", candid);
-}
-
-export function registerPhoneResponse(
-    candid: ApiRegisterPhoneNumberResponse
-): RegisterPhoneResponse {
-    if ("Success" in candid) {
-        return {
-            kind: "register_phone_success",
-            id: candid.Success.attribute_id,
-        };
-    }
-    if ("AlreadyRegistered" in candid) {
-        return {
-            kind: "register_phone_already_registered",
-        };
-    }
-    if ("InvalidPhoneNumber" in candid) {
-        return {
-            kind: "register_phone_invalid",
-        };
-    }
-    throw new UnsupportedValueError("Unexpected register phone response type returned", candid);
+    throw new UnsupportedValueError("Unexpected register attribute response type returned", candid);
 }
 
 export function profile(candid: ApiProfileResponse): Profile {

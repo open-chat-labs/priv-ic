@@ -35,6 +35,7 @@
         &.selected {
             color: white;
             background-color: hotpink;
+            border: 1px solid hotpink;
             transform: scale(1.05);
             @include box-shadow(1);
         }

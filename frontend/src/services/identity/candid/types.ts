@@ -18,16 +18,19 @@ export interface AppProfileViewSuccessResult {
   'phone' : AppPhoneFacet,
 }
 export type AttributeId = bigint;
+export type AttributeValue = { 'Email' : string } |
+  { 'Phone' : PhoneNumber };
 export interface ConfirmVerificationCodeArgs {
   'attribute_id' : AttributeId,
   'verification_code' : string,
 }
-export type ConfirmVerificationCodeResponse = { 'NotSent' : null } |
-  { 'AlreadyConfirmed' : null } |
-  { 'NotFound' : null } |
+export type ConfirmVerificationCodeResponse = { 'AttributeNotFound' : null } |
+  { 'VerificationCodeIncorrect' : null } |
   { 'Success' : null } |
-  { 'ConfirmationCodeExpired' : null } |
-  { 'ConfirmationCodeIncorrect' : null };
+  { 'AlreadyVerified' : null } |
+  { 'VerificationCodeExpired' : null } |
+  { 'IdentityNotFound' : null } |
+  { 'VerificationCodeInvalid' : null };
 export interface EmailFacet { 'addresses' : Array<VerifiableEmailAddress> }
 export interface Identity { 'email' : EmailFacet, 'phone' : PhoneFacet }
 export interface IndexedVerificationCode {
@@ -46,20 +49,11 @@ export interface ProfileSuccessResult {
   'apps' : Array<App>,
   'identity' : Identity,
 }
-export interface RegisterEmailAddressSuccessResult {
-  'attribute_id' : AttributeId,
-}
-export interface RegisterEmailArgs { 'email_address' : string }
-export type RegisterEmailResponse = { 'AlreadyRegistered' : null } |
-  { 'Success' : RegisterEmailAddressSuccessResult } |
-  { 'InvalidEmailAddress' : null };
-export interface RegisterPhoneNumberArgs { 'phone_number' : PhoneNumber }
-export type RegisterPhoneNumberResponse = { 'AlreadyRegistered' : null } |
-  { 'Success' : RegisterPhoneNumberSuccessResult } |
-  { 'InvalidPhoneNumber' : null };
-export interface RegisterPhoneNumberSuccessResult {
-  'attribute_id' : AttributeId,
-}
+export interface RegisterAttributeArgs { 'value' : AttributeValue }
+export type RegisterAttributeResponse = { 'AlreadyRegistered' : null } |
+  { 'Success' : RegisterAttributeSuccessResult } |
+  { 'InvalidValue' : null };
+export interface RegisterAttributeSuccessResult { 'attribute_id' : AttributeId }
 export interface RemoveVerificationCodesArgs { 'up_to_index' : bigint }
 export type RemoveVerificationCodesResponse = { 'NotAuthorized' : null } |
   { 'Success' : null };
@@ -94,8 +88,7 @@ export interface VerificationCode {
 }
 export type VerificationCodeStatus = { 'Sent' : TimestampMillis } |
   { 'Verified' : TimestampMillis } |
-  { 'Expired' : TimestampMillis } |
-  { 'Pending' : null };
+  { 'Expired' : TimestampMillis };
 export type VerificationCodeTarget = { 'Email' : string } |
   { 'Phone' : string };
 export interface VerificationCodesArgs { 'from_index' : bigint }
@@ -124,11 +117,8 @@ export interface _SERVICE {
       VerificationCodesResponse
     >,
   'profile' : (arg_0: ProfileArgs) => Promise<ProfileResponse>,
-  'register_email' : (arg_0: RegisterEmailArgs) => Promise<
-      RegisterEmailResponse
-    >,
-  'register_phone_number' : (arg_0: RegisterPhoneNumberArgs) => Promise<
-      RegisterPhoneNumberResponse
+  'register_attribute' : (arg_0: RegisterAttributeArgs) => Promise<
+      RegisterAttributeResponse
     >,
   'send_verification_code' : (arg_0: SendVerificationCodeArgs) => Promise<
       SendVerificationCodeResponse

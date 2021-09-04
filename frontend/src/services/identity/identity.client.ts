@@ -4,17 +4,15 @@ import type {
     ConfirmCodeResponse,
     PhoneNumber,
     Profile,
-    RegisterPhoneResponse,
+    RegisterAttributeResponse,
     SendCodeResponse,
-    RegisterEmailResponse,
     VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import { CandidService } from "../candidService";
 import {
     confirmCodeResponse,
     profile,
-    registerEmailResponse,
-    registerPhoneResponse,
+    registerAttributeResponse,
     sendCodeResponse,
     visibleProfileAttributesResponse,
 } from "./mappers";
@@ -40,23 +38,27 @@ export class IdentityClient extends CandidService implements IIdentityClient {
     getProfile(): Promise<Profile> {
         return this.handleResponse(this.identityService.profile({}), profile);
     }
-    registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterPhoneResponse> {
+    registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse> {
         return this.handleResponse(
-            this.identityService.register_phone_number({
-                phone_number: {
-                    country_code: phoneNumber.countryCode,
-                    number: phoneNumber.number,
+            this.identityService.register_attribute({
+                value: {
+                    Phone: {
+                        country_code: phoneNumber.countryCode,
+                        number: phoneNumber.number,
+                    },
                 },
             }),
-            registerPhoneResponse
+            registerAttributeResponse
         );
     }
-    registerEmailAddress(address: string): Promise<RegisterEmailResponse> {
+    registerEmailAddress(address: string): Promise<RegisterAttributeResponse> {
         return this.handleResponse(
-            this.identityService.register_email({
-                email_address: address,
+            this.identityService.register_attribute({
+                value: {
+                    Email: address,
+                },
             }),
-            registerEmailResponse
+            registerAttributeResponse
         );
     }
     sendVerificationCode(id: bigint): Promise<SendCodeResponse> {

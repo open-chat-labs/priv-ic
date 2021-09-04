@@ -19,7 +19,7 @@
         serviceContainer
             .registerPhoneNumber({ countryCode, number: phoneNumber })
             .then((resp) => {
-                if (resp.kind === "register_phone_success") {
+                if (resp.kind === "register_attribute_success") {
                     dispatch("registeredPhoneNumber", {
                         id: resp.id,
                         status: "pending",
