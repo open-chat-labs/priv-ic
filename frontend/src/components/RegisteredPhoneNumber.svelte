@@ -1,6 +1,7 @@
 <script lang="ts">
     import Button from "./Button.svelte";
     import Input from "./Input.svelte";
+    import { fade } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
     import type { PhoneNumber, Verifiable } from "../domain/identity/identity";
@@ -8,7 +9,7 @@
     export let error: string | undefined = undefined;
     export let serviceContainer: ServiceContainer;
     export let phoneNumber: Verifiable<PhoneNumber>;
-    export let granted: boolean = false;
+    export let visibility: boolean | undefined = undefined;
 
     let busy: boolean = false;
     let sendingCode: boolean = false;
@@ -44,6 +45,14 @@
         // todo - don't have an endpoint for this at the moment
         dispatch("unregistered", phoneNumber.id);
     }
+
+    function grant() {
+        dispatch("grant", phoneNumber.id);
+    }
+
+    function revoke() {
+        dispatch("revoke", phoneNumber.id);
+    }
 </script>
 
 <div class="phone-number">
@@ -52,10 +61,14 @@
         {phoneNumber.value.number}
     </div>
     <div class="actions">
-        {#if granted}
-            <Button accent={true}>Revoke</Button>
-        {:else}
-            <Button accent={true}>Grant</Button>
+        {#if visibility !== undefined}
+            <span transition:fade>
+                {#if visibility}
+                    <Button on:click={revoke} bad={true}>Revoke</Button>
+                {:else}
+                    <Button on:click={grant} good={true}>Grant</Button>
+                {/if}
+            </span>
         {/if}
         {#if phoneNumber.status === "pending"}
             <Button loading={sendingCode} disabled={busy} on:click={sendVerificationCode}

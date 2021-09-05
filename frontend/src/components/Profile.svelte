@@ -55,17 +55,31 @@
         profile = removeEmailAddress(profile, ev.detail);
     }
 
-    function selectApp(app: ClientAppType) {
-        selectedApp = app;
-        loadingAppProfile = true;
-        serviceContainer
-            .visibleProfileAttributes(app.domainName)
-            .then((resp) => {
-                if (resp !== "not_found") {
-                    visibleAttributes = resp;
-                }
-            })
-            .finally(() => (loadingAppProfile = false));
+    function toggleApp(app: ClientAppType) {
+        selectedApp = app === selectedApp ? undefined : app;
+        if (selectedApp) {
+            loadingAppProfile = true;
+            serviceContainer
+                .visibleProfileAttributes(app.domainName)
+                .then((resp) => {
+                    if (resp !== "not_found") {
+                        visibleAttributes = resp;
+                    }
+                })
+                .finally(() => (loadingAppProfile = false));
+        }
+    }
+
+    function grant(ev: CustomEvent<bigint>) {
+        if (selectedApp) {
+            console.log("grant access to attribute: ", ev.detail);
+        }
+    }
+
+    function revoke(ev: CustomEvent<bigint>) {
+        if (selectedApp) {
+            console.log("revoke access to attribute: ", ev.detail);
+        }
     }
 </script>
 
@@ -96,7 +110,7 @@
                                 <ClientApp
                                     loading={loadingAppProfile}
                                     selected={selectedApp === app}
-                                    on:click={() => selectApp(app)}
+                                    on:click={() => toggleApp(app)}
                                     {app} />
                             {/each}
                         </div>
@@ -124,7 +138,11 @@
                         {:else}
                             {#each profile.identity.phone.numbers as phoneNumber, i (phoneNumber)}
                                 <RegisteredPhoneNumber
-                                    granted={visibleAttributes.includes(phoneNumber.id)}
+                                    on:grant={grant}
+                                    on:revoke={revoke}
+                                    visibility={selectedApp && !loadingAppProfile
+                                        ? visibleAttributes.includes(phoneNumber.id)
+                                        : undefined}
                                     on:unregistered={unregisterPhone}
                                     {phoneNumber}
                                     {serviceContainer} />
@@ -154,7 +172,11 @@
                         {:else}
                             {#each profile.identity.email.addresses as emailAddress, i (emailAddress)}
                                 <RegisteredEmailAddress
-                                    granted={visibleAttributes.includes(emailAddress.id)}
+                                    on:grant={grant}
+                                    on:revoke={revoke}
+                                    visibility={selectedApp && !loadingAppProfile
+                                        ? visibleAttributes.includes(emailAddress.id)
+                                        : undefined}
                                     on:unregistered={unregisterEmail}
                                     {emailAddress}
                                     {serviceContainer} />
@@ -165,7 +187,9 @@
             {/if}
         </div>
     </main>
-    <div class="right" />
+    <div class="right">
+        <div class="right-inner" />
+    </div>
 </div>
 
 <style type="text/scss">
@@ -178,6 +202,12 @@
         @include fullScreenImg("../assets/quiet.jpg");
         flex: auto;
     }
+
+    .right-inner {
+        height: 100%;
+        backdrop-filter: invert(1);
+    }
+
     .main {
         display: flex;
         flex-direction: column;

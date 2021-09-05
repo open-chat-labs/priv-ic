@@ -6,6 +6,8 @@
     export let small: boolean = false;
     export let fill: boolean = false;
     export let accent: boolean = false;
+    export let bad: boolean = false;
+    export let good: boolean = false;
 </script>
 
 <button
@@ -17,6 +19,8 @@
     {disabled}
     class:secondary
     class:accent
+    class:good
+    class:bad
     class:fill>
     {#if !loading}
         <slot />
@@ -63,6 +67,18 @@
 
         &.accent {
             background: hotpink;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+        }
+
+        &.good {
+            background: seagreen;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+        }
+
+        &.bad {
+            background: orangered;
             color: #ffffff;
             border: 1px solid #ffffff;
         }

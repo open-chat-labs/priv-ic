@@ -1,7 +1,6 @@
 <script lang="ts">
     import { appLookup } from "../domain/identity/identity";
     import type { ClientApp } from "../domain/identity/identity";
-    import Loading from "./Loading.svelte";
 
     export let app: ClientApp;
     export let selected: boolean = false;
