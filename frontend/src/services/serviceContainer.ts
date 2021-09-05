@@ -5,6 +5,7 @@ import type {
     Profile,
     RegisterAttributeResponse,
     SendCodeResponse,
+    SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
 } from "../domain/identity/identity";
 import { IdentityClient } from "./identity/identity.client";
@@ -39,5 +40,12 @@ export class ServiceContainer {
 
     visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse> {
         return this._identityClient.visibleProfileAttributes(domainName);
+    }
+
+    setVisibleProfileAttributes(
+        domainName: string,
+        attributes: bigint[]
+    ): Promise<SetVisibleProfileAttributesResponse> {
+        return this._identityClient.setVisibleProfileAttributes(domainName, attributes);
     }
 }

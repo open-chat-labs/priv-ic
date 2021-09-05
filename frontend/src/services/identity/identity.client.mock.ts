@@ -9,6 +9,7 @@ import {
     addEmailAddress,
     VisibleProfileAttributesResponse,
     VerificationCodeStatus,
+    SetVisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import type { IIdentityClient } from "./identity.client.interface";
 import { v1 as uuidv1 } from "uuid";
@@ -158,6 +159,19 @@ export class IdentityClientMock implements IIdentityClient {
         return new Promise((res) => {
             setTimeout(() => {
                 res(this._visibility[domainName] ?? []);
+            }, 1000);
+        });
+    }
+
+    setVisibleProfileAttributes(
+        domainName: string,
+        attributes: bigint[]
+    ): Promise<SetVisibleProfileAttributesResponse> {
+        this._visibility[domainName] = attributes;
+        this.save();
+        return new Promise((res) => {
+            setTimeout(() => {
+                res("success");
             }, 1000);
         });
     }

@@ -133,3 +133,5 @@ export type ConfirmCodeResponse =
     | "attribute_not_found";
 
 export type VisibleProfileAttributesResponse = "not_found" | bigint[];
+
+export type SetVisibleProfileAttributesResponse = "success";

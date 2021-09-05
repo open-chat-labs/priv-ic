@@ -6,6 +6,7 @@ import type {
     Profile,
     RegisterAttributeResponse,
     SendCodeResponse,
+    SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import { CandidService } from "../candidService";
@@ -14,6 +15,7 @@ import {
     profile,
     registerAttributeResponse,
     sendCodeResponse,
+    setVisibleProfileAttributesResponse,
     visibleProfileAttributesResponse,
 } from "./mappers";
 import type { IIdentityClient } from "./identity.client.interface";
@@ -84,6 +86,18 @@ export class IdentityClient extends CandidService implements IIdentityClient {
                 app_domain_name: domainName,
             }),
             visibleProfileAttributesResponse
+        );
+    }
+    setVisibleProfileAttributes(
+        domainName: string,
+        attributes: bigint[]
+    ): Promise<SetVisibleProfileAttributesResponse> {
+        return this.handleResponse(
+            this.identityService.set_visible_profile_attributes({
+                app_domain_name: domainName,
+                attributes: attributes,
+            }),
+            setVisibleProfileAttributesResponse
         );
     }
 }

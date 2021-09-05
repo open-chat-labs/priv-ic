@@ -4,6 +4,7 @@ import type {
     Profile,
     RegisterAttributeResponse,
     SendCodeResponse,
+    SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 
@@ -14,4 +15,8 @@ export interface IIdentityClient {
     sendVerificationCode(id: bigint): Promise<SendCodeResponse>;
     confirmVerificationCode(id: bigint, code: string): Promise<ConfirmCodeResponse>;
     visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse>;
+    setVisibleProfileAttributes(
+        domainName: string,
+        attributes: bigint[]
+    ): Promise<SetVisibleProfileAttributesResponse>;
 }

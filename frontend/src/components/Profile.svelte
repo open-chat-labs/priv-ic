@@ -22,6 +22,7 @@
     import NewEmailAddress from "./NewEmailAddress.svelte";
     import RegisteredPhoneNumber from "./RegisteredPhoneNumber.svelte";
     import RegisteredEmailAddress from "./RegisteredEmailAddress.svelte";
+    import app from "../main";
 
     export let serviceContainer: ServiceContainer;
     let profile: Profile;
@@ -72,13 +73,29 @@
 
     function grant(ev: CustomEvent<bigint>) {
         if (selectedApp) {
-            console.log("grant access to attribute: ", ev.detail);
+            const { domainName } = selectedApp;
+            visibleAttributes = [ev.detail, ...visibleAttributes];
+            serviceContainer.setVisibleProfileAttributes(domainName, visibleAttributes).then(() => {
+                serviceContainer.visibleProfileAttributes(domainName).then((resp) => {
+                    if (resp !== "not_found") {
+                        visibleAttributes = resp;
+                    }
+                });
+            });
         }
     }
 
     function revoke(ev: CustomEvent<bigint>) {
         if (selectedApp) {
-            console.log("revoke access to attribute: ", ev.detail);
+            const { domainName } = selectedApp;
+            visibleAttributes = visibleAttributes.filter((attr) => attr !== ev.detail);
+            serviceContainer.setVisibleProfileAttributes(domainName, visibleAttributes).then(() => {
+                serviceContainer.visibleProfileAttributes(domainName).then((resp) => {
+                    if (resp !== "not_found") {
+                        visibleAttributes = resp;
+                    }
+                });
+            });
         }
     }
 </script>

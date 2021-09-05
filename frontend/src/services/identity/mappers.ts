@@ -8,6 +8,7 @@ import type {
     ApiProfileResponse,
     ApiRegisterAttributeResponse,
     ApiSendVerificationCodeResponse,
+    ApiSetVisibleProfileAttributesResponse,
     ApiVerificationCodeStatus,
     ApiVisibleProfileAttributesResponse,
 } from "./candid/idl";
@@ -24,8 +25,15 @@ import {
     SendCodeResponse,
     ConfirmCodeResponse,
     VisibleProfileAttributesResponse,
+    SetVisibleProfileAttributesResponse,
 } from "../../domain/identity/identity";
 import { UnsupportedValueError } from "../../utils/error";
+
+export function setVisibleProfileAttributesResponse(
+    _candid: ApiSetVisibleProfileAttributesResponse
+): SetVisibleProfileAttributesResponse {
+    return "success";
+}
 
 export function visibleProfileAttributesResponse(
     candid: ApiVisibleProfileAttributesResponse
