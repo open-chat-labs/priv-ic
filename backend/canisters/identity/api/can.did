@@ -1,5 +1,68 @@
 import "../../../libraries/types/can.did";
 
+type Identity = 
+    record {
+        email: EmailFacet;
+        phone: PhoneFacet;
+    };
+
+type EmailFacet = 
+    record {
+        addresses: vec VerifiableEmailAddress;
+    };
+
+type PhoneFacet = 
+    record {
+        numbers: vec VerifiablePhoneNumber;
+    };
+
+type VerificationCodeStatus =
+    variant {
+        Sent: TimestampMillis;
+        Expired: TimestampMillis;
+        Verified: TimestampMillis;
+    };
+
+type VerifiableEmailAddress =
+    record {
+        id: AttributeId;
+        status: VerificationCodeStatus;
+        added: TimestampMillis;
+        value: text;
+    };
+
+type VerifiablePhoneNumber =
+    record {
+        id: AttributeId;
+        status: VerificationCodeStatus;
+        added: TimestampMillis;
+        value: PhoneNumber;
+    };
+
+type AppEmailFacet = 
+    record {
+        any_verified: bool;
+        attributes: vec AppVerifiableEmailAddress;
+    };
+
+type AppPhoneFacet = 
+    record {
+        any_verified: bool;
+        attributes: vec AppVerifiablePhoneNumber;
+    };    
+
+type AppVerifiableEmailAddress = 
+    record {
+        value: text;
+        verified: bool;
+    };
+ 
+type AppVerifiablePhoneNumber = 
+    record {
+        value: PhoneNumber;
+        verified: bool;
+    };
+
 type ProfileArgs =
     record {
     };
@@ -32,17 +95,18 @@ type VisibleAttributesSuccessResult =
         attributes: vec AttributeId;
     };
 
-type AppProfileViewArgs =
+type AppProfileArgs =
     record {
     };
 
-type AppProfileViewResponse =
+type AppProfileResponse =
     variant {
-        Success: AppProfileViewSuccessResult;
-        NotFound;
+        Success: AppProfileSuccessResult;
+        ApplicationNotRegistered;
+        IdentityNotFound;
     };
 
-type AppProfileViewSuccessResult =
+type AppProfileSuccessResult =
     record {
         email: AppEmailFacet;
         phone: AppPhoneFacet;
@@ -188,7 +252,7 @@ service: (InitArgs) -> {
     register_application: (RegisterApplicationArgs) -> (RegisterApplicationResponse);
 
     // Called by an app to get the view of the profile visible to the given app
-    app_profile_view: (AppProfileViewArgs) -> (AppProfileViewResponse) query;
+    app_profile: (AppProfileArgs) -> (AppProfileResponse) query;
 
     //// Verification code sender
     ext_verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse);

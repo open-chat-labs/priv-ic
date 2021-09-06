@@ -7,10 +7,14 @@ use types::{ApplicationId, AttributeId, UserId};
 pub struct ApplicationMap {
     app_domains_by_user: HashMap<UserId, HashSet<String>>,
     app_to_user: HashMap<ApplicationId, UserId>,
-    app_attributes: HashMap<ApplicationId, Vec<AttributeId>>,
+    app_attributes: HashMap<ApplicationId, HashSet<AttributeId>>,
 }
 
 impl ApplicationMap {
+    pub fn user_id(&self, application_id: &ApplicationId) -> Option<&UserId> {
+        self.app_to_user.get(application_id)
+    }
+
     pub fn register(&mut self, user_id: UserId, domain_name: String) -> bool {
         let application_id = self.derive_application_id(&user_id, &domain_name);
         // Insert a user if it doesn't exist or get current set of application domains
@@ -24,6 +28,7 @@ impl ApplicationMap {
             return false;
         }
 
+        self.app_attributes.insert(application_id, HashSet::new());
         self.app_to_user.insert(application_id, user_id).is_none()
     }
 
@@ -36,7 +41,10 @@ impl ApplicationMap {
         let application_id = self.derive_application_id(&user_id, &domain_name);
         let registered = self.app_to_user.contains_key(&application_id);
         if registered {
-            self.app_attributes.insert(application_id, attributes);
+            self.app_attributes.insert(
+                application_id,
+                attributes.iter().cloned().collect(),
+            );
         }
         registered
     }
@@ -48,19 +56,30 @@ impl ApplicationMap {
         }
     }
 
-    pub fn attributes(&self, user_id: UserId, domain_name: String) -> Option<Vec<AttributeId>> {
-        let application_id = self.derive_application_id(&user_id, &domain_name);
-        let registered = self.app_to_user.contains_key(&application_id);
+    pub fn attributes_by_id(
+        &self,
+        application_id: &ApplicationId,
+    ) -> Option<&HashSet<AttributeId>> {
+        let registered = self.app_to_user.contains_key(application_id);
         if !registered {
             return None;
         }
 
-        let attributes = match self.app_attributes.get(&application_id) {
-            None => Vec::default(),
-            Some(attrs) => attrs.to_vec(),
+        let attributes = match self.app_attributes.get(application_id) {
+            None => return None,
+            Some(attrs) => attrs,
         };
 
         Some(attributes)
+    }
+
+    pub fn attributes(
+        &self,
+        user_id: &UserId,
+        domain_name: String,
+    ) -> Option<&HashSet<AttributeId>> {
+        let application_id = self.derive_application_id(user_id, &domain_name);
+        self.attributes_by_id(&application_id)
     }
 
     fn derive_application_id(&self, _user_id: &UserId, _domain_name: &str) -> ApplicationId {

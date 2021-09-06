@@ -12,69 +12,6 @@ type PhoneNumber =
         number: text;
     };
 
-type Identity = 
-    record {
-        email: EmailFacet;
-        phone: PhoneFacet;
-    };
-
-type EmailFacet = 
-    record {
-        addresses: vec VerifiableEmailAddress;
-    };
-
-type PhoneFacet = 
-    record {
-        numbers: vec VerifiablePhoneNumber;
-    };
-
-type VerificationCodeStatus =
-    variant {
-        Sent: TimestampMillis;
-        Expired: TimestampMillis;
-        Verified: TimestampMillis;
-    };
-
-type VerifiableEmailAddress =
-    record {
-        id: AttributeId;
-        status: VerificationCodeStatus;
-        added: TimestampMillis;
-        value: text;
-    };
-
-type VerifiablePhoneNumber =
-    record {
-        id: AttributeId;
-        status: VerificationCodeStatus;
-        added: TimestampMillis;
-        value: PhoneNumber;
-    };
-
-type AppEmailAddress = 
-    record {
-        value: text;
-        verified: bool;
-    };
-
-type AppEmailFacet = 
-    record {
-        any_verified: bool;
-        addresses: vec AppEmailAddress;
-    };
-
-type AppPhoneFacet = 
-    record {
-        any_verified: bool;
-        numbers: vec AppPhoneNumber;
-    };    
-
-type AppPhoneNumber = 
-    record {
-        value: text;
-        verified: bool;
-    };
-
 type IndexedVerificationCode =
     record {
         index: nat64;

@@ -12,9 +12,11 @@ fn visible_attributes_impl(args: Args, runtime_state: &RuntimeState) -> Response
     match runtime_state
         .data
         .applications
-        .attributes(user_id, args.app_domain_name)
+        .attributes(&user_id, args.app_domain_name)
     {
         None => ApplicationNotRegistered,
-        Some(attributes) => Success(SuccessResult { attributes }),
+        Some(attributes) => Success(SuccessResult {
+            attributes: attributes.iter().cloned().collect(),
+        }),
     }
 }

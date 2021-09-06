@@ -18,7 +18,6 @@ fn profile_impl(runtime_state: &RuntimeState) -> Response {
         None => NotFound,
         Some(internal_identity) => {
             let identity = map_identity(internal_identity, runtime_state.env.now());
-            let user_id = runtime_state.env.caller().into();
             let apps = runtime_state
                 .data
                 .applications
