@@ -24,6 +24,7 @@
             .then((resp) => {
                 if (resp === "success") {
                     dispatch("codeSent", emailAddress);
+                    emailAddress.status = "sent";
                 }
             })
             .finally(() => (sendingCode = busy = false));
@@ -36,6 +37,7 @@
             .then((resp) => {
                 if (resp === "success") {
                     dispatch("codeVerified", emailAddress);
+                    emailAddress.status = "verified";
                 }
             })
             .finally(() => (confirmingCode = busy = false));

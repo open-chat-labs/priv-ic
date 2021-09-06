@@ -293,8 +293,8 @@
     .main {
         display: flex;
         flex-direction: column;
-        flex: 0 0 800px;
-        max-width: 800px;
+        flex: 0 0 900px;
+        max-width: 900px;
         padding: 20px 50px 50px 50px;
         @include fullHeight();
         margin: auto;

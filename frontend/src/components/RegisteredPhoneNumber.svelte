@@ -23,6 +23,7 @@
             .then((resp) => {
                 if (resp === "success") {
                     dispatch("codeSent", phoneNumber);
+                    phoneNumber.status = "sent";
                 }
             })
             .finally(() => (sendingCode = busy = false));
@@ -35,6 +36,7 @@
             .then((resp) => {
                 if (resp === "success") {
                     dispatch("codeVerified", phoneNumber);
+                    phoneNumber.status = "verified";
                 }
             })
             .finally(() => (confirmingCode = busy = false));
