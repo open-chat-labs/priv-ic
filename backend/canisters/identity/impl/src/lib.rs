@@ -1,3 +1,4 @@
+use crate::model::application_map::ApplicationMap;
 use crate::model::identity_map::IdentityMap;
 use candid::Principal;
 use std::cell::RefCell;
@@ -37,6 +38,7 @@ impl RuntimeState {
 pub struct Data {
     pub verification_code_sender_principals: HashSet<Principal>,
     pub identities: IdentityMap,
+    pub applications: ApplicationMap,
     pub verifications_to_send: EventStream<VerificationCode>,
 }
 
@@ -47,6 +49,7 @@ impl Data {
                 .into_iter()
                 .collect(),
             identities: IdentityMap::default(),
+            applications: ApplicationMap::default(),
             verifications_to_send: EventStream::default(),
         }
     }

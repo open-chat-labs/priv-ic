@@ -3,8 +3,8 @@
     "identity": {
       "type": "custom",
       "candid": "backend/canisters/identity/api/can.did",
-      "wasm": "target/wasm32-unknown-unknown/release/identity_canister_impl-opt.wasm",
-      "build": "./generate-wasm.sh identity_canister_impl"
+      "wasm": "target/wasm32-unknown-unknown/release/identity_canister-opt.wasm",
+      "build": "./generate-wasm.sh identity_canister"
     },
     "website": {
       "frontend": {

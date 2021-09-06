@@ -9,4 +9,4 @@ edition = "2018"
 candid = "0.7.6"
 phonenumber = "0.3.1"
 serde = "1.0.130"
-uuid = { version = "0.8", features = ["v4"] }
+uuid = { version = "0.8", features = ["v4", "wasm-bindgen"] }
