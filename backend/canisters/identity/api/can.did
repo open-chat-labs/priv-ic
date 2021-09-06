@@ -13,21 +13,21 @@ type ProfileResponse =
 type ProfileSuccessResult =
     record {
         identity: Identity;
-        apps: vec App;
+        apps: vec Application;
     };
 
-type VisibleProfileAttributesArgs =
+type VisibleAttributesArgs =
     record {
         app_domain_name: text;
     };
 
-type VisibleProfileAttributesResponse =
+type VisibleAttributesResponse =
     variant {
-        Success: VisibleProfileAttributesSuccessResult;
-        NotFound;
+        Success: VisibleAttributesSuccessResult;
+        ApplicationNotRegistered;
     };
 
-type VisibleProfileAttributesSuccessResult =
+type VisibleAttributesSuccessResult =
     record {
         attributes: vec AttributeId;
     };
@@ -48,15 +48,16 @@ type AppProfileViewSuccessResult =
         phone: AppPhoneFacet;
     };
 
-type SetVisibleProfileAttributesArgs =
+type SetVisibleAttributesArgs =
     record {
         app_domain_name: text;
         attributes: vec AttributeId;
     };
 
-type SetVisibleProfileAttributesResponse =
+type SetVisibleAttributesResponse =
     variant {
         Success;
+        ApplicationNotRegistered;
     };
 
 type RegisterAttributeArgs =
@@ -114,6 +115,18 @@ type ConfirmVerificationCodeResponse =
         IdentityNotFound;
     };
 
+type RemoveAttributeArgs =
+    record {
+        attribute_id: AttributeId;
+    };
+
+type RemoveAttributeResponse =
+    variant {
+        Success;
+        AttributeNotFound;
+        IdentityNotFound;
+    };
+
 type VerificationCodesArgs =
     record {
         from_index: nat64;
@@ -141,25 +154,38 @@ type RemoveVerificationCodesResponse =
         NotAuthorized;
     };
 
+type RegisterApplicationArgs =
+    record {
+        app_domain_name: text;
+    };
+
+type RegisterApplicationResponse =
+    variant {
+        Success;
+        AlreadyRegistered;
+    };
+
 type InitArgs = 
     record {
         verification_code_sender_principals: vec principal;
     };
 
 service: (InitArgs) -> {
-    // Your full profile consisting of your identity attributes and the apps to which
-    // you have given access to at least one attribute
+    // Your full profile consisting of your identity attributes and registered apps
     profile: (ProfileArgs) -> (ProfileResponse) query;
 
     // The list of attributes visible to the given app
-    visible_profile_attributes: (VisibleProfileAttributesArgs) -> (VisibleProfileAttributesResponse) query;
+    visible_attributes: (VisibleAttributesArgs) -> (VisibleAttributesResponse) query;
 
     // Set the list of attributes which should be visible to the given app
-    set_visible_profile_attributes: (SetVisibleProfileAttributesArgs) -> (SetVisibleProfileAttributesResponse);
+    set_visible_attributes: (SetVisibleAttributesArgs) -> (SetVisibleAttributesResponse);
 
     register_attribute: (RegisterAttributeArgs) -> (RegisterAttributeResponse);
     send_verification_code: (SendVerificationCodeArgs) -> (SendVerificationCodeResponse);
     confirm_verification_code: (ConfirmVerificationCodeArgs) -> (ConfirmVerificationCodeResponse);
+    remove_attribute: (RemoveAttributeArgs) -> (RemoveAttributeResponse);
+
+    register_application: (RegisterApplicationArgs) -> (RegisterApplicationResponse);
 
     // Called by an app to get the view of the profile visible to the given app
     app_profile_view: (AppProfileViewArgs) -> (AppProfileViewResponse) query;

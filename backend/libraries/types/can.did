@@ -1,7 +1,7 @@
 type AttributeId = nat;
 type TimestampMillis = nat64;
 
-type App =
+type Application =
     record {
         domain_name: text;
     };
