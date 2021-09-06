@@ -6,6 +6,9 @@
         removePhoneNumber,
         addEmailAddress,
         removeEmailAddress,
+        openchat,
+        updatePhoneStatus,
+        updateEmailStatus,
     } from "../domain/identity/identity";
     import type {
         PhoneNumber,
@@ -22,15 +25,42 @@
     import NewEmailAddress from "./NewEmailAddress.svelte";
     import RegisteredPhoneNumber from "./RegisteredPhoneNumber.svelte";
     import RegisteredEmailAddress from "./RegisteredEmailAddress.svelte";
-    import app from "../main";
+    import type { DataRequest } from "../domain/requirements/requirements";
+    import { returnToClient } from "../services/auth";
 
     export let serviceContainer: ServiceContainer;
-    let profile: Profile;
+    export let dataRequest: DataRequest | undefined;
+    let profile: Profile | undefined;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
     let loadingAppProfile: boolean = false;
-    let selectedApp: ClientAppType | undefined = undefined;
     let visibleAttributes: bigint[] = [];
+
+    $: selectedApp = dataRequest ? { domainName: openchat } : undefined;
+
+    $: {
+        if (areRequirementsMet(profile)) {
+            returnToClient();
+        }
+    }
+
+    // todo - obviously this is nowhere near good enough for the general case
+    function areRequirementsMet(profile: Profile | undefined): boolean {
+        if (dataRequest === undefined) return true;
+        if (profile === undefined) return false;
+
+        let met = true;
+
+        if (dataRequest.requirements.phone !== undefined) {
+            met = met && profile.identity.phone.numbers.some((n) => n.status === "verified");
+        }
+
+        if (dataRequest.requirements.email !== undefined) {
+            met = met && profile.identity.email.addresses.some((a) => a.status === "verified");
+        }
+
+        return met;
+    }
 
     onMount(() => {
         serviceContainer.getProfile().then((p) => {
@@ -39,25 +69,49 @@
     });
 
     function registeredPhoneNumber(ev: CustomEvent<Verifiable<PhoneNumber>>) {
+        if (!profile) return;
         profile = addPhoneNumber(profile, ev.detail);
         addingPhoneNumber = false;
     }
 
     function registeredEmailAddress(ev: CustomEvent<Verifiable<string>>) {
+        if (!profile) return;
         profile = addEmailAddress(profile, ev.detail);
         addingEmail = false;
     }
 
     function unregisterPhone(ev: CustomEvent<bigint>) {
+        if (!profile) return;
         profile = removePhoneNumber(profile, ev.detail);
     }
 
     function unregisterEmail(ev: CustomEvent<bigint>) {
+        if (!profile) return;
         profile = removeEmailAddress(profile, ev.detail);
     }
 
+    function phoneCodeSent(ev: CustomEvent<bigint>) {
+        if (!profile) return;
+        profile = updatePhoneStatus(profile, ev.detail, "sent");
+    }
+
+    function phoneCodeVerified(ev: CustomEvent<bigint>) {
+        if (!profile) return;
+        profile = updatePhoneStatus(profile, ev.detail, "verified");
+    }
+
+    function emailCodeSent(ev: CustomEvent<bigint>) {
+        if (!profile) return;
+        profile = updateEmailStatus(profile, ev.detail, "sent");
+    }
+
+    function emailCodeVerified(ev: CustomEvent<bigint>) {
+        if (!profile) return;
+        profile = updateEmailStatus(profile, ev.detail, "verified");
+    }
+
     function toggleApp(app: ClientAppType) {
-        selectedApp = app === selectedApp ? undefined : app;
+        selectedApp = app.domainName === selectedApp?.domainName ? undefined : app;
         if (selectedApp) {
             loadingAppProfile = true;
             serviceContainer
@@ -103,19 +157,20 @@
 <div class="wrapper">
     <div class="left" />
     <main class="main">
-        <h1 class="headline">Welcome to PrivIC</h1>
+        {#if dataRequest === undefined}
+            <h1 class="headline">Welcome to PrivIC</h1>
 
-        <p class="blurb">
-            All of your personal information in one place. You are in control of exactly which
-            personal information your favourite dApps have access to. See at a glance who is using
-            what and revoke access at any time.
-        </p>
-
-        <div class="profile">
+            <p class="blurb">
+                All of your personal information in one place. You are in control of exactly which
+                personal information your favourite dApps have access to. See at a glance who is
+                using what and revoke access at any time.
+            </p>
+        {/if}
+        <div class="profile" class:loading={profile === undefined}>
             {#if profile === undefined}
                 <Loading />
             {:else}
-                {#if profile.apps.length > 0}
+                {#if profile.apps.length > 0 && dataRequest === undefined}
                     <section class="section">
                         <div class="section-header">
                             <h5 class="section-title">Connected apps</h5>
@@ -126,81 +181,89 @@
                             {#each profile.apps as app, i (app)}
                                 <ClientApp
                                     loading={loadingAppProfile}
-                                    selected={selectedApp === app}
+                                    selected={selectedApp?.domainName === app.domainName}
                                     on:click={() => toggleApp(app)}
                                     {app} />
                             {/each}
                         </div>
                     </section>
                 {/if}
-                <section class="section">
-                    <div class="section-header">
-                        <h5 class="section-title">Phone numbers</h5>
-                        <div class="icon" on:click={() => (addingPhoneNumber = true)}>
-                            <HoverIcon>
-                                <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
-                            </HoverIcon>
+                {#if dataRequest === undefined || dataRequest?.requirements.phone !== undefined}
+                    <section class="section">
+                        <div class="section-header">
+                            <h5 class="section-title">Phone numbers</h5>
+                            <div class="icon" on:click={() => (addingPhoneNumber = true)}>
+                                <HoverIcon>
+                                    <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
+                                </HoverIcon>
+                            </div>
                         </div>
-                    </div>
-                    <div class="section-body">
-                        {#if addingPhoneNumber}
-                            <NewPhoneNumber
-                                on:registeredPhoneNumber={registeredPhoneNumber}
-                                {serviceContainer} />
-                        {/if}
-                        {#if profile.identity.phone.numbers.length === 0 && !addingPhoneNumber}
-                            <p class="advice">
-                                Click the button above to register a new phone number
-                            </p>
-                        {:else}
-                            {#each profile.identity.phone.numbers as phoneNumber, i (phoneNumber)}
-                                <RegisteredPhoneNumber
-                                    on:grant={grant}
-                                    on:revoke={revoke}
-                                    visibility={selectedApp && !loadingAppProfile
-                                        ? visibleAttributes.includes(phoneNumber.id)
-                                        : undefined}
-                                    on:unregistered={unregisterPhone}
-                                    {phoneNumber}
+                        <div class="section-body">
+                            {#if addingPhoneNumber}
+                                <NewPhoneNumber
+                                    on:registeredPhoneNumber={registeredPhoneNumber}
                                     {serviceContainer} />
-                            {/each}
-                        {/if}
-                    </div>
-                </section>
-                <section class="section">
-                    <div class="section-header">
-                        <h5 class="section-title">Email addresses</h5>
-                        <div class="icon" on:click={() => (addingEmail = true)}>
-                            <HoverIcon>
-                                <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
-                            </HoverIcon>
+                            {/if}
+                            {#if profile.identity.phone.numbers.length === 0 && !addingPhoneNumber}
+                                <p class="advice">
+                                    Click the button above to register a new phone number
+                                </p>
+                            {:else}
+                                {#each profile.identity.phone.numbers as phoneNumber, i (phoneNumber)}
+                                    <RegisteredPhoneNumber
+                                        on:grant={grant}
+                                        on:revoke={revoke}
+                                        on:codeSent={phoneCodeSent}
+                                        on:codeVerified={phoneCodeVerified}
+                                        visibility={selectedApp && !loadingAppProfile
+                                            ? visibleAttributes.includes(phoneNumber.id)
+                                            : undefined}
+                                        on:unregistered={unregisterPhone}
+                                        {phoneNumber}
+                                        {serviceContainer} />
+                                {/each}
+                            {/if}
                         </div>
-                    </div>
-                    <div class="section-body">
-                        {#if addingEmail}
-                            <NewEmailAddress
-                                on:registeredEmailAddress={registeredEmailAddress}
-                                {serviceContainer} />
-                        {/if}
-                        {#if profile.identity.email.addresses.length === 0 && !addingEmail}
-                            <p class="advice">
-                                Click the button above to register a new email address
-                            </p>
-                        {:else}
-                            {#each profile.identity.email.addresses as emailAddress, i (emailAddress)}
-                                <RegisteredEmailAddress
-                                    on:grant={grant}
-                                    on:revoke={revoke}
-                                    visibility={selectedApp && !loadingAppProfile
-                                        ? visibleAttributes.includes(emailAddress.id)
-                                        : undefined}
-                                    on:unregistered={unregisterEmail}
-                                    {emailAddress}
+                    </section>
+                {/if}
+                {#if dataRequest === undefined || dataRequest?.requirements.email !== undefined}
+                    <section class="section">
+                        <div class="section-header">
+                            <h5 class="section-title">Email addresses</h5>
+                            <div class="icon" on:click={() => (addingEmail = true)}>
+                                <HoverIcon>
+                                    <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
+                                </HoverIcon>
+                            </div>
+                        </div>
+                        <div class="section-body">
+                            {#if addingEmail}
+                                <NewEmailAddress
+                                    on:registeredEmailAddress={registeredEmailAddress}
                                     {serviceContainer} />
-                            {/each}
-                        {/if}
-                    </div>
-                </section>
+                            {/if}
+                            {#if profile.identity.email.addresses.length === 0 && !addingEmail}
+                                <p class="advice">
+                                    Click the button above to register a new email address
+                                </p>
+                            {:else}
+                                {#each profile.identity.email.addresses as emailAddress, i (emailAddress)}
+                                    <RegisteredEmailAddress
+                                        on:grant={grant}
+                                        on:revoke={revoke}
+                                        on:codeSent={emailCodeSent}
+                                        on:codeVerified={emailCodeVerified}
+                                        visibility={selectedApp && !loadingAppProfile
+                                            ? visibleAttributes.includes(emailAddress.id)
+                                            : undefined}
+                                        on:unregistered={unregisterEmail}
+                                        {emailAddress}
+                                        {serviceContainer} />
+                                {/each}
+                            {/if}
+                        </div>
+                    </section>
+                {/if}
             {/if}
         </div>
     </main>
@@ -242,11 +305,14 @@
     }
 
     .profile {
-        padding: $sp4;
+        padding: $sp5;
         background-color: #ffffff;
         @include box-shadow(1);
-        height: 100%;
         border-radius: $sp4;
+
+        &.loading {
+            min-height: 500px;
+        }
     }
 
     .headline {

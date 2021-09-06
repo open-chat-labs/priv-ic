@@ -23,7 +23,7 @@
             .sendVerificationCode(emailAddress.id)
             .then((resp) => {
                 if (resp === "success") {
-                    emailAddress.status = "sent";
+                    dispatch("codeSent", emailAddress);
                 }
             })
             .finally(() => (sendingCode = busy = false));
@@ -35,7 +35,7 @@
             .confirmVerificationCode(emailAddress.id, codeValue)
             .then((resp) => {
                 if (resp === "success") {
-                    emailAddress.status = "verified";
+                    dispatch("codeVerified", emailAddress);
                 }
             })
             .finally(() => (confirmingCode = busy = false));

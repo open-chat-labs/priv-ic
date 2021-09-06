@@ -10,13 +10,12 @@ import {
     VisibleProfileAttributesResponse,
     VerificationCodeStatus,
     SetVisibleProfileAttributesResponse,
+    distrikt,
+    openchat,
+    dscvr,
 } from "../../domain/identity/identity";
 import type { IIdentityClient } from "./identity.client.interface";
 import { v1 as uuidv1 } from "uuid";
-
-const distrikt = "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/";
-const openchat = "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/";
-const dscvr = "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/";
 
 type VisibilityCache = Record<string, bigint[]>;
 
@@ -40,31 +39,10 @@ export class IdentityClientMock implements IIdentityClient {
 
         const cachedProfile = localStorage.getItem("privic_profile");
         if (!cachedProfile) {
-            this._profile = addPhoneNumber(
-                {
-                    ...nullProfile,
-                    apps: [
-                        { domainName: distrikt },
-                        { domainName: openchat },
-                        { domainName: dscvr },
-                    ],
-                },
-                {
-                    id: this._nextId++,
-                    status: "pending",
-                    added: BigInt(+new Date()),
-                    value: {
-                        countryCode: 44,
-                        number: "07867538921",
-                    },
-                }
-            );
-            this._profile = addEmailAddress(this._profile, {
-                id: this._nextId++,
-                status: "verified",
-                added: BigInt(+new Date()),
-                value: "julian.jelfs@gmail.com",
-            });
+            this._profile = {
+                ...nullProfile,
+                apps: [{ domainName: distrikt }, { domainName: openchat }, { domainName: dscvr }],
+            };
         } else {
             this._profile = JSON.parse(cachedProfile);
         }
@@ -72,7 +50,7 @@ export class IdentityClientMock implements IIdentityClient {
         const cachedVis = localStorage.getItem("privic_vis");
         if (!cachedVis) {
             this._visibility = {
-                [openchat]: [BigInt(0), BigInt(1)],
+                [openchat]: [],
             };
         } else {
             this._visibility = JSON.parse(cachedVis);

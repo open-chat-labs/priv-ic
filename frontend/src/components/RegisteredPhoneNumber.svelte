@@ -22,7 +22,7 @@
             .sendVerificationCode(phoneNumber.id)
             .then((resp) => {
                 if (resp === "success") {
-                    phoneNumber.status = "sent";
+                    dispatch("codeSent", phoneNumber);
                 }
             })
             .finally(() => (sendingCode = busy = false));
@@ -34,7 +34,7 @@
             .confirmVerificationCode(phoneNumber.id, codeValue)
             .then((resp) => {
                 if (resp === "success") {
-                    phoneNumber.status = "verified";
+                    dispatch("codeVerified", phoneNumber);
                 }
             })
             .finally(() => (confirmingCode = busy = false));
@@ -42,7 +42,6 @@
     }
 
     function unregister() {
-        // todo - don't have an endpoint for this at the moment
         dispatch("unregistered", phoneNumber.id);
     }
 

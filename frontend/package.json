@@ -59,12 +59,10 @@
         "util": "0.12.3"
     },
     "dependencies": {
-        "@dfinity/agent": "^0.9.0",
-        "@dfinity/auth-client": "^0.9.0",
-        "@dfinity/authentication": "^0.9.0",
-        "@dfinity/candid": "^0.9.1",
-        "@dfinity/identity": "^0.9.0",
-        "@dfinity/principal": "^0.9.1",
+        "@dfinity/agent": "^0.10.0",
+        "@dfinity/auth-client": "^0.10.0",
+        "@dfinity/authentication": "^0.10.0",
+        "@dfinity/principal": "^0.10.0",
         "@fortawesome/free-solid-svg-icons": "^5.15.3",
         "country-telephone-data": "^0.6.3",
         "sirv-cli": "^1.0.0",
