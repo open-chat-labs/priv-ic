@@ -33,6 +33,22 @@ impl RuntimeState {
             .verification_code_sender_principals
             .contains(&self.env.caller())
     }
+
+    pub fn rand_u128(&mut self) -> u128 {
+        let mut val = 0_u128;
+        for i in 0..4 {
+            let b = self.env.random_u32() as u128;
+            val |= b;
+            if i < 3 {
+                val <<= 32;
+            }
+        }
+        val
+    }
+
+    pub fn new_verification_code(&mut self) -> String {
+        format!("{:0>6}", self.env.random_u32() % 10000)
+    }
 }
 
 pub struct Data {
@@ -52,5 +68,25 @@ impl Data {
             applications: ApplicationMap::default(),
             verifications_to_send: EventStream::default(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use types::AttributeId;
+    use utils::env::test::TestEnv;
+
+    #[test]
+    fn test_rand_u128() {
+        let env = TestEnv::default();
+        let mut state = RuntimeState::new(Box::new(env), Data::new(vec![]));
+
+        let value = state.rand_u128();
+        println!("u128: {}", value);
+        assert!(value > 0);
+
+        let attribute_id: AttributeId = value.into();
+        println!("attribute_id: {:?}", attribute_id);
     }
 }

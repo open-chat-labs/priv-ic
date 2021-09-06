@@ -41,10 +41,8 @@ impl ApplicationMap {
         let application_id = self.derive_application_id(&user_id, &domain_name);
         let registered = self.app_to_user.contains_key(&application_id);
         if registered {
-            self.app_attributes.insert(
-                application_id,
-                attributes.iter().cloned().collect(),
-            );
+            self.app_attributes
+                .insert(application_id, attributes.iter().cloned().collect());
         }
         registered
     }
@@ -83,6 +81,10 @@ impl ApplicationMap {
     }
 
     fn derive_application_id(&self, _user_id: &UserId, _domain_name: &str) -> ApplicationId {
-        Principal::anonymous().into()
+        // TODO:
+        // Hardcoded with my dfx openchat identity
+        Principal::from_text("t3mli-46uhw-2flyo-aer5b-ip3pt-ij5jc-whvah-hcbbp-d7qli-emafc-aae")
+            .unwrap()
+            .into()
     }
 }

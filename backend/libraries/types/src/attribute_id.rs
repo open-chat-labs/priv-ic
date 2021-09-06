@@ -1,6 +1,6 @@
 use candid::CandidType;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+//use uuid::Uuid;
 
 #[derive(
     CandidType,
@@ -21,11 +21,5 @@ pub struct AttributeId(u128);
 impl From<u128> for AttributeId {
     fn from(value: u128) -> AttributeId {
         AttributeId(value)
-    }
-}
-
-impl AttributeId {
-    pub fn new() -> AttributeId {
-        AttributeId(Uuid::new_v4().as_u128())
     }
 }
