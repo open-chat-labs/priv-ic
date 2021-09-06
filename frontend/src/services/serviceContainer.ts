@@ -4,6 +4,7 @@ import type {
     PhoneNumber,
     Profile,
     RegisterAttributeResponse,
+    RemoveAttributeResponse,
     SendCodeResponse,
     SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
@@ -20,6 +21,10 @@ export class ServiceContainer {
 
     getProfile(): Promise<Profile> {
         return this._identityClient.getProfile();
+    }
+
+    removeAttribute(id: bigint): Promise<RemoveAttributeResponse> {
+        return this._identityClient.removeAttribute(id);
     }
 
     registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse> {

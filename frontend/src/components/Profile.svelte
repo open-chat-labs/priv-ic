@@ -82,11 +82,13 @@
 
     function unregisterPhone(ev: CustomEvent<bigint>) {
         if (!profile) return;
+        serviceContainer.removeAttribute(ev.detail);
         profile = removePhoneNumber(profile, ev.detail);
     }
 
     function unregisterEmail(ev: CustomEvent<bigint>) {
         if (!profile) return;
+        serviceContainer.removeAttribute(ev.detail);
         profile = removeEmailAddress(profile, ev.detail);
     }
 
@@ -117,7 +119,7 @@
             serviceContainer
                 .visibleProfileAttributes(app.domainName)
                 .then((resp) => {
-                    if (resp !== "not_found") {
+                    if (resp !== "application_not_registered") {
                         visibleAttributes = resp;
                     }
                 })
@@ -131,7 +133,7 @@
             visibleAttributes = [ev.detail, ...visibleAttributes];
             serviceContainer.setVisibleProfileAttributes(domainName, visibleAttributes).then(() => {
                 serviceContainer.visibleProfileAttributes(domainName).then((resp) => {
-                    if (resp !== "not_found") {
+                    if (resp !== "application_not_registered") {
                         visibleAttributes = resp;
                     }
                 });
@@ -145,7 +147,7 @@
             visibleAttributes = visibleAttributes.filter((attr) => attr !== ev.detail);
             serviceContainer.setVisibleProfileAttributes(domainName, visibleAttributes).then(() => {
                 serviceContainer.visibleProfileAttributes(domainName).then((resp) => {
-                    if (resp !== "not_found") {
+                    if (resp !== "application_not_registered") {
                         visibleAttributes = resp;
                     }
                 });

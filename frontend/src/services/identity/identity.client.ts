@@ -5,6 +5,7 @@ import type {
     PhoneNumber,
     Profile,
     RegisterAttributeResponse,
+    RemoveAttributeResponse,
     SendCodeResponse,
     SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
@@ -14,6 +15,7 @@ import {
     confirmCodeResponse,
     profile,
     registerAttributeResponse,
+    removeAttributeResponse,
     sendCodeResponse,
     setVisibleProfileAttributesResponse,
     visibleProfileAttributesResponse,
@@ -39,6 +41,14 @@ export class IdentityClient extends CandidService implements IIdentityClient {
     }
     getProfile(): Promise<Profile> {
         return this.handleResponse(this.identityService.profile({}), profile);
+    }
+    removeAttribute(id: bigint): Promise<RemoveAttributeResponse> {
+        return this.handleResponse(
+            this.identityService.remove_attribute({
+                attribute_id: id,
+            }),
+            removeAttributeResponse
+        );
     }
     registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse> {
         return this.handleResponse(
@@ -82,7 +92,7 @@ export class IdentityClient extends CandidService implements IIdentityClient {
     }
     visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse> {
         return this.handleResponse(
-            this.identityService.visible_profile_attributes({
+            this.identityService.visible_attributes({
                 app_domain_name: domainName,
             }),
             visibleProfileAttributesResponse
@@ -93,7 +103,7 @@ export class IdentityClient extends CandidService implements IIdentityClient {
         attributes: bigint[]
     ): Promise<SetVisibleProfileAttributesResponse> {
         return this.handleResponse(
-            this.identityService.set_visible_profile_attributes({
+            this.identityService.set_visible_attributes({
                 app_domain_name: domainName,
                 attributes: attributes,
             }),

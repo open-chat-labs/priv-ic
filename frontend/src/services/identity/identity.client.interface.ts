@@ -3,6 +3,7 @@ import type {
     PhoneNumber,
     Profile,
     RegisterAttributeResponse,
+    RemoveAttributeResponse,
     SendCodeResponse,
     SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
@@ -11,6 +12,7 @@ import type {
 export interface IIdentityClient {
     getProfile(): Promise<Profile>;
     registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse>;
+    removeAttribute(id: bigint): Promise<RemoveAttributeResponse>;
     registerEmailAddress(address: string): Promise<RegisterAttributeResponse>;
     sendVerificationCode(id: bigint): Promise<SendCodeResponse>;
     confirmVerificationCode(id: bigint, code: string): Promise<ConfirmCodeResponse>;

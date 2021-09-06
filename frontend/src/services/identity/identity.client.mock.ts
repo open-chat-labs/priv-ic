@@ -13,6 +13,7 @@ import {
     distrikt,
     openchat,
     dscvr,
+    RemoveAttributeResponse,
 } from "../../domain/identity/identity";
 import type { IIdentityClient } from "./identity.client.interface";
 import { v1 as uuidv1 } from "uuid";
@@ -73,6 +74,21 @@ export class IdentityClientMock implements IIdentityClient {
             if (x.id === id) {
                 x.status = status;
             }
+        });
+    }
+
+    removeAttribute(id: bigint): Promise<RemoveAttributeResponse> {
+        this._profile.identity.email.addresses = this._profile.identity.email.addresses.filter(
+            (a) => a.id !== id
+        );
+        this._profile.identity.phone.numbers = this._profile.identity.phone.numbers.filter(
+            (a) => a.id !== id
+        );
+        this.save();
+        return new Promise((res) => {
+            setTimeout(() => {
+                res("remove_success");
+            }, 1000);
         });
     }
 

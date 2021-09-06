@@ -148,6 +148,11 @@ export type Verifiable<T> = {
 
 export type VerificationCodeStatus = "pending" | "sent" | "verified" | "expired";
 
+export type RemoveAttributeResponse =
+    | "remove_success"
+    | "remove_attribute_not_found"
+    | "remove_identity_not_found";
+
 export type RegisterAttributeResponse =
     | RegisterAttributeSuccess
     | RegisterAttributeAlreadyRegistered
@@ -184,6 +189,6 @@ export type ConfirmCodeResponse =
     | "identity_not_found"
     | "attribute_not_found";
 
-export type VisibleProfileAttributesResponse = "not_found" | bigint[];
+export type VisibleProfileAttributesResponse = "application_not_registered" | bigint[];
 
 export type SetVisibleProfileAttributesResponse = "success";

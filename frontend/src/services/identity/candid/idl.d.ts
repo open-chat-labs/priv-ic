@@ -11,8 +11,9 @@ import {
     RegisterAttributeResponse,
     SendVerificationCodeResponse,
     ConfirmVerificationCodeResponse,
-    VisibleProfileAttributesResponse,
-    SetVisibleProfileAttributesResponse,
+    VisibleAttributesResponse,
+    SetVisibleAttributesResponse,
+    RemoveAttributeResponse,
 } from "./types";
 export {
     _SERVICE as IdentityService,
@@ -26,8 +27,9 @@ export {
     RegisterAttributeResponse as ApiRegisterAttributeResponse,
     SendVerificationCodeResponse as ApiSendVerificationCodeResponse,
     ConfirmVerificationCodeResponse as ApiConfirmVerificationCodeResponse,
-    VisibleProfileAttributesResponse as ApiVisibleProfileAttributesResponse,
-    SetVisibleProfileAttributesResponse as ApiSetVisibleProfileAttributesResponse,
+    VisibleAttributesResponse as ApiVisibleAttributesResponse,
+    SetVisibleAttributesResponse as ApiSetVisibleAttributesResponse,
+    RemoveAttributeResponse as ApiRemoveAttributeResponse,
 };
 
 export const idlFactory: IDL.InterfaceFactory;
