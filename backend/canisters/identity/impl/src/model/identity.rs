@@ -9,6 +9,10 @@ pub struct Identity {
 }
 
 impl Identity {
+    pub fn get_mut(&mut self, id: &AttributeId) -> Option<&mut Attribute> {
+        self.attributes.get_mut(id)
+    }
+    
     pub fn values(&self) -> hash_map::Values<'_, AttributeId, Attribute> {
         self.attributes.values()
     }
@@ -17,8 +21,11 @@ impl Identity {
         self.attributes.insert(attribute.id(), attribute);
     }
 
-    pub fn get_mut(&mut self, id: &AttributeId) -> Option<&mut Attribute> {
-        self.attributes.get_mut(id)
+    pub fn remove(&mut self, attribute_id: AttributeId) -> bool {
+        match self.attributes.remove(&attribute_id) {
+            None => false,
+            Some(_) => true,
+        }
     }
 }
 
