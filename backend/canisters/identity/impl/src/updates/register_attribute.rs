@@ -12,7 +12,7 @@ fn register_attribute(args: Args) -> Response {
 }
 
 fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {
-    let caller = runtime_state.env.caller();
+    let user_id = runtime_state.env.caller().into();
     let now = runtime_state.env.now();
 
     let value = match args.value.try_normalise() {
@@ -44,7 +44,7 @@ fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Resp
     match runtime_state
         .data
         .identities
-        .try_register_attribute(caller, attribute)
+        .try_register_attribute(user_id, attribute)
     {
         false => AlreadyRegistered,
         true => Success(SuccessResult { attribute_id }),
