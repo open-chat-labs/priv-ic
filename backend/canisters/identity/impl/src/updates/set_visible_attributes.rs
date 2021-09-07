@@ -9,12 +9,11 @@ fn set_visible_attributes(args: Args) -> Response {
 
 fn set_visible_attributes_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {
     let user_id = runtime_state.env.caller().into();
-    match runtime_state.data.applications.set_attributes(
-        user_id,
-        args.app_domain_name,
-        args.attributes,
-    ) {
-        false => ApplicationNotRegistered,
-        true => Success,
-    }
+
+    runtime_state
+        .data
+        .applications
+        .set_attributes(user_id, args.app_domain_name, args.attributes);
+
+    Success
 }

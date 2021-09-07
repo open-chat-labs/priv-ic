@@ -155,7 +155,6 @@ type SetVisibleAttributesArgs =
 type SetVisibleAttributesResponse =
     variant {
         Success;
-        ApplicationNotRegistered;
     };
 
 type RegisterAttributeArgs =
