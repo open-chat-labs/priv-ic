@@ -126,11 +126,10 @@
         serviceContainer
             .getProfile()
             .then((p) => {
-                alert(p);
                 profile = p;
             })
             .catch((_err) => {
-                console.log(_err);
+                console.log("Error loading profile: ", _err);
                 alert(_err);
             });
     });
@@ -204,7 +203,7 @@
                     if (resp !== "application_not_registered") {
                         visibleAttributes = resp;
                     } else {
-                        alert(resp);
+                        console.log(resp);
                     }
                 });
             });
