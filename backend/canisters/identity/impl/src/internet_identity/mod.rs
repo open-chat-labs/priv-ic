@@ -179,9 +179,9 @@ fn get_delegation(
     session_key: SessionKey,
     expiration: Timestamp,
 ) -> GetDelegationResponse {
-    let principal = caller();
-
     check_frontend_length(&frontend);
+
+    let principal = caller();
 
     STATE.with(|state| {
         match get_signature(
@@ -202,6 +202,14 @@ fn get_delegation(
             None => GetDelegationResponse::NoSuchDelegation,
         }
     })
+}
+
+pub fn get_principal(caller: Principal, frontend: &FrontendHostname) -> Principal {
+    check_frontend_length(frontend);
+
+    let seed = calculate_seed(caller, frontend);
+    let public_key = der_encode_canister_sig_key(seed.to_vec());
+    Principal::self_authenticating(&public_key)
 }
 
 fn calculate_seed(principal: Principal, frontend: &FrontendHostname) -> Hash {

@@ -14,7 +14,7 @@ fn register_application_impl(args: Args, runtime_state: &mut RuntimeState) -> Re
         .applications
         .register(user_id, args.app_domain_name)
     {
-        true => Success,
-        false => AlreadyRegistered,
+        Some(_) => Success,
+        None => AlreadyRegistered,
     }
 }

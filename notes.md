@@ -20,6 +20,9 @@ dfx deploy identity --argument '(record { verification_code_sender_principals = 
 // Re-install privIC identity canister
 dfx canister install identity --mode=reinstall --argument '(record { verification_code_sender_principals = vec { principal "tu45y-p4p3d-b4gg4-gmyy3-rgweo-whsrq-fephi-vshrn-cipca-xdkri-pae" } })'
 
+// Initialize the random salt used when creating key delegations
+dfx canister call identity init_salt '()'
+
 // Try to get the user's profile (NotFound expected)
 dfx canister call identity profile '(record {})'
 
@@ -46,3 +49,9 @@ dfx canister call identity set_visible_attributes '(record { app_domain_name = "
 
 // Get the user's visible attributes for openchat
 dfx canister call identity visible_attributes '(record { app_domain_name = "open.chat"})'
+
+// Remove the email attribute
+dfx canister call identity remove_attribute '(record { attribute_id = 96_354_772_376_859_874_691_335_558_453_701_129_962 })'
+
+// Try to re-register the email
+dfx canister call identity register_attribute '(record { value = variant { Email = "megrogan@gmail.com"} })'

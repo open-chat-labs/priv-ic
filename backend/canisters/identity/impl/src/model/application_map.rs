@@ -1,4 +1,4 @@
-use candid::Principal;
+use crate::internet_identity::get_principal;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::{HashMap, HashSet};
 use types::{AppUserId, AttributeId, UserId};
@@ -15,8 +15,9 @@ impl ApplicationMap {
         self.app_user_to_user.get(app_user_id)
     }
 
-    pub fn register(&mut self, user_id: UserId, domain_name: String) -> bool {
-        let app_user_id = self.derive_app_user_id(&user_id, &domain_name);
+    pub fn register(&mut self, user_id: UserId, domain_name: String) -> Option<AppUserId> {
+        let app_user_id = Self::derive_app_user_id(user_id, &domain_name);
+
         // Insert a user if it doesn't exist or get current set of application domains
         let user_apps = match self.apps_by_user.entry(user_id) {
             Occupied(e) => e.into_mut(),
@@ -25,11 +26,12 @@ impl ApplicationMap {
 
         // Insert the application and return false if it is already registered
         if user_apps.insert(domain_name, app_user_id).is_some() {
-            return false;
+            return None;
         }
 
         self.app_attributes.insert(app_user_id, HashSet::new());
-        self.app_user_to_user.insert(app_user_id, user_id).is_none()
+        self.app_user_to_user.insert(app_user_id, user_id);
+        Some(app_user_id)
     }
 
     pub fn set_attributes(
@@ -37,15 +39,15 @@ impl ApplicationMap {
         user_id: UserId,
         domain_name: String,
         attributes: Vec<AttributeId>,
-    ) -> bool {
+    ) {
+        // If the app has not already been registered then register it now
         let app_user_id = match self.lookup_app_user_id(&user_id, &domain_name) {
-            None => return false,
+            None => self.register(user_id, domain_name).unwrap(),
             Some(auid) => *auid,
         };
 
         let attribute_set = attributes.iter().cloned().collect();
         self.app_attributes.insert(app_user_id, attribute_set);
-        true
     }
 
     pub fn remove_attribute(&mut self, user_id: &UserId, attribute_id: &AttributeId) {
@@ -102,11 +104,8 @@ impl ApplicationMap {
         }
     }
 
-    fn derive_app_user_id(&self, _user_id: &UserId, _domain_name: &str) -> AppUserId {
-        // TODO:
-        // Hardcoded with my dfx openchat identity
-        Principal::from_text("lenfi-kkaku-kmbwr-sccjg-7i47q-bpz5o-i5vx7-cmpoj-sdvjf-vctfa-mae")
-            .unwrap()
-            .into()
+    #[allow(clippy::ptr_arg)]
+    fn derive_app_user_id(user_id: UserId, domain_name: &String) -> AppUserId {
+        get_principal(user_id.into(), domain_name).into()
     }
 }

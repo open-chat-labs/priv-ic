@@ -155,7 +155,6 @@ type SetVisibleAttributesArgs =
 type SetVisibleAttributesResponse =
     variant {
         Success;
-        ApplicationNotRegistered;
     };
 
 type RegisterAttributeArgs =
@@ -317,4 +316,5 @@ service: (InitArgs) -> {
     // Identity
     prepare_delegation : (FrontendHostname, SessionKey, maxTimeToLive : opt nat64) -> (UserKey, TimestampMillis);
     get_delegation: (FrontendHostname, SessionKey, TimestampMillis) -> (GetDelegationResponse) query;
+    init_salt: () -> ();
 }
