@@ -12,6 +12,9 @@ mod model;
 mod queries;
 mod updates;
 
+#[allow(clippy::all)]
+mod internet_identity;
+
 pub const CONFIRMATION_CODE_EXPIRY_MILLIS: u64 = 60 * 60 * 1000; // 1 hour
 
 thread_local! {

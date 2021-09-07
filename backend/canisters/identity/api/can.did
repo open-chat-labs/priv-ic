@@ -1,5 +1,9 @@
 type AttributeId = nat;
+type FrontendHostname = text;
+type PublicKey = blob;
+type SessionKey = PublicKey;
 type TimestampMillis = nat64;
+type UserKey = PublicKey;
 
 type Application =
     record {
@@ -264,6 +268,28 @@ type InitArgs =
         verification_code_sender_principals: vec principal;
     };
 
+type Delegation =
+    record {
+        pubkey: PublicKey;
+        expiration: TimestampMillis;
+        targets: opt vec principal;
+    };
+
+type SignedDelegation =
+    record {
+        delegation: Delegation;
+        signature: blob;
+    };
+
+type GetDelegationResponse =
+    variant {
+        // The signed delegation was successfully retrieved.
+        signed_delegation: SignedDelegation;
+
+        // The signature is not ready. Maybe retry by calling `prepare_delegation`
+        no_such_delegation
+    };
+
 service: (InitArgs) -> {
     // Your full profile consisting of your identity attributes and registered apps
     profile: (ProfileArgs) -> (ProfileResponse) query;
@@ -284,7 +310,11 @@ service: (InitArgs) -> {
     // Called by an app to get the view of the profile visible to the given app
     app_profile: (AppProfileArgs) -> (AppProfileResponse) query;
 
-    //// Verification code sender
+    // Verification code sender
     ext_verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse) query;
     ext_remove_verification_codes: (RemoveVerificationCodesArgs) -> (RemoveVerificationCodesResponse);
+
+    // Identity
+    prepare_delegation : (FrontendHostname, SessionKey, maxTimeToLive : opt nat64) -> (UserKey, TimestampMillis);
+    get_delegation: (FrontendHostname, SessionKey, TimestampMillis) -> (GetDelegationResponse) query;
 }
