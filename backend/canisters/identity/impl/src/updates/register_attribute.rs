@@ -20,8 +20,8 @@ fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Resp
         Some(v) => v,
     };
 
-    let verification_code = runtime_state.new_verification_code();
-    let attribute_id = runtime_state.rand_u128().into();
+    let verification_code = runtime_state.env.new_verification_code();
+    let attribute_id = runtime_state.env.rand_u128().into();
     let sent_state = VerificationCodeSentState {
         code: verification_code.clone(),
         date: now,
