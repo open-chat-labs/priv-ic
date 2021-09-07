@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import PlusCircleOutline from "svelte-material-icons/PlusCircleOutline.svelte";
     import {
         addPhoneNumber,
         removePhoneNumber,
@@ -18,18 +17,17 @@
     } from "../domain/identity/identity";
 
     import type { ServiceContainer } from "../services/serviceContainer";
-    import HoverIcon from "./HoverIcon.svelte";
     import Loading from "./Loading.svelte";
     import NewPhoneNumber from "./NewPhoneNumber.svelte";
     import ClientApp from "./ClientApp.svelte";
     import NewEmailAddress from "./NewEmailAddress.svelte";
-    import RegisteredPhoneNumber from "./RegisteredPhoneNumber.svelte";
-    import RegisteredEmailAddress from "./RegisteredEmailAddress.svelte";
+    import RegisteredAttribute from "./RegisteredAttribute.svelte";
     import type { DataRequest } from "../domain/requirements/requirements";
     import { returnToClient } from "../services/auth";
+    import Link from "./Link.svelte";
 
     export let serviceContainer: ServiceContainer;
-    export let dataRequest: DataRequest | undefined;
+    export let dataRequest: DataRequest | undefined = undefined;
     let profile: Profile | undefined;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
@@ -194,11 +192,8 @@
                     <section class="section">
                         <div class="section-header">
                             <h5 class="section-title">Phone numbers</h5>
-                            <div class="icon" on:click={() => (addingPhoneNumber = true)}>
-                                <HoverIcon>
-                                    <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
-                                </HoverIcon>
-                            </div>
+                            <Link on:click={() => (addingPhoneNumber = true)} underline="always"
+                                >+ new</Link>
                         </div>
                         <div class="section-body">
                             {#if addingPhoneNumber}
@@ -212,7 +207,7 @@
                                 </p>
                             {:else}
                                 {#each profile.identity.phone.numbers as phoneNumber, i (phoneNumber)}
-                                    <RegisteredPhoneNumber
+                                    <RegisteredAttribute
                                         on:grant={grant}
                                         on:revoke={revoke}
                                         on:codeSent={phoneCodeSent}
@@ -221,8 +216,11 @@
                                             ? visibleAttributes.includes(phoneNumber.id)
                                             : undefined}
                                         on:unregistered={unregisterPhone}
-                                        {phoneNumber}
-                                        {serviceContainer} />
+                                        attribute={phoneNumber}
+                                        {serviceContainer}>
+                                        <span class="code">(+{phoneNumber.value.countryCode})</span>
+                                        {phoneNumber.value.number}
+                                    </RegisteredAttribute>
                                 {/each}
                             {/if}
                         </div>
@@ -232,11 +230,8 @@
                     <section class="section">
                         <div class="section-header">
                             <h5 class="section-title">Email addresses</h5>
-                            <div class="icon" on:click={() => (addingEmail = true)}>
-                                <HoverIcon>
-                                    <PlusCircleOutline size={"1.5em"} color={"hotpink"} />
-                                </HoverIcon>
-                            </div>
+                            <Link on:click={() => (addingEmail = true)} underline="always"
+                                >+ new</Link>
                         </div>
                         <div class="section-body">
                             {#if addingEmail}
@@ -250,7 +245,7 @@
                                 </p>
                             {:else}
                                 {#each profile.identity.email.addresses as emailAddress, i (emailAddress)}
-                                    <RegisteredEmailAddress
+                                    <RegisteredAttribute
                                         on:grant={grant}
                                         on:revoke={revoke}
                                         on:codeSent={emailCodeSent}
@@ -259,8 +254,10 @@
                                             ? visibleAttributes.includes(emailAddress.id)
                                             : undefined}
                                         on:unregistered={unregisterEmail}
-                                        {emailAddress}
-                                        {serviceContainer} />
+                                        attribute={emailAddress}
+                                        {serviceContainer}>
+                                        {emailAddress.value}
+                                    </RegisteredAttribute>
                                 {/each}
                             {/if}
                         </div>
@@ -283,6 +280,9 @@
         @include fullHeight();
         @include fullScreenImg("../assets/quiet.jpg");
         flex: auto;
+        @include size-below(xs) {
+            display: none;
+        }
     }
 
     .right-inner {
@@ -302,7 +302,9 @@
         overflow: auto;
 
         @include size-below(xs) {
-            padding: 20px 20px;
+            padding: 0;
+            flex: 1;
+            background-color: #ffffff;
         }
     }
 
@@ -315,6 +317,11 @@
         &.loading {
             min-height: 500px;
         }
+
+        @include size-below(xs) {
+            border-radius: 0;
+            box-shadow: none;
+        }
     }
 
     .headline {
@@ -323,7 +330,7 @@
     }
 
     .blurb {
-        margin-bottom: $sp4;
+        margin-bottom: $sp5;
         @include font(light, normal, fs-90);
     }
 

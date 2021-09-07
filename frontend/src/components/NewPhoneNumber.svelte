@@ -47,7 +47,7 @@
             {/each}
         </Select>
     </div>
-    <div class="number">
+    <form class="number" on:submit|preventDefault={registerPhoneNumber}>
         <Input
             invalid={error !== undefined}
             autofocus={true}
@@ -55,7 +55,7 @@
             minlength={3}
             maxlength={25}
             placeholder="Phone number" />
-    </div>
+    </form>
     <div class="actions">
         <Button loading={registering} disabled={!valid} on:click={registerPhoneNumber}
             >Register</Button>

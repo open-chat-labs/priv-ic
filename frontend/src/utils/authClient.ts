@@ -293,10 +293,10 @@ export class AuthClient {
     }
 
     public returnToClientApp(): void {
-        if (window.opener && this._authSuccess) {
+        if (window.parent && this._authSuccess) {
             // todo - not restricting the origin here is very dodgy but it doesn't work otherwise
             // not sure why
-            window.opener.postMessage(this._authSuccess, "*");
+            window.parent.postMessage(this._authSuccess, "*");
         }
     }
 
@@ -321,8 +321,8 @@ export class AuthClient {
                 }
                 case "authorize-ready": {
                     // just relay this to the opener
-                    if (window.opener) {
-                        window.opener.postMessage(message, "*");
+                    if (window.parent) {
+                        window.parent.postMessage(message, "*");
                     }
                     break;
                 }

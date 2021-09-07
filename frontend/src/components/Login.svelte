@@ -8,7 +8,7 @@
 
 <ModalPage bgClass="quiet">
     <h4 class="subtitle">Login required ...</h4>
-    <h1 class="title">Login to PrivIC</h1>
+    <h1 class="title">{loading ? "Logging in to PrivIC" : "Login to PrivIC"}</h1>
     <p class="blurb">
         You personal information in one place and under <strong>your</strong> control. Share only what
         you choose to with your favourite dApps.

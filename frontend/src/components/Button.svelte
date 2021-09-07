@@ -32,17 +32,12 @@
         transition: background ease-in-out 200ms;
         background: #191919;
         color: #ffffff;
-        padding: $sp3 $sp6;
+        padding: $sp2 $sp5;
         cursor: pointer;
         border: 1px solid #191919;
-        min-height: 45px;
-        min-width: 150px;
-        @include font(book, normal, fs-100);
-
-        &.small {
-            padding: $sp2 $sp5;
-            @include font(book, normal, fs-90);
-        }
+        min-height: 40px;
+        min-width: 120px;
+        @include font(book, normal, fs-80);
 
         &:hover {
             background: #333333;

@@ -35,7 +35,7 @@
 </script>
 
 <div class="email-address">
-    <div class="address">
+    <form class="address" on:submit|preventDefault={registerEmailAddress}>
         <Input
             invalid={error !== undefined}
             autofocus={true}
@@ -43,7 +43,7 @@
             minlength={3}
             maxlength={100}
             placeholder="Email address" />
-    </div>
+    </form>
     <div class="actions">
         <Button loading={registering} disabled={!valid} on:click={registerEmailAddress}
             >Register</Button>
