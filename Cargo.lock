@@ -947,11 +947,16 @@ dependencies = [
 name = "identity_canister"
 version = "0.1.0"
 dependencies = [
+ "base64 0.13.0",
  "candid",
+ "hex",
  "ic-cdk",
  "ic-cdk-macros",
  "identity_canister_api",
  "serde",
+ "serde_bytes",
+ "serde_cbor",
+ "sha2",
  "types",
  "utils",
 ]
