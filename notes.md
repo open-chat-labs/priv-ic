@@ -20,6 +20,9 @@ dfx deploy identity --argument '(record { verification_code_sender_principals = 
 // Re-install privIC identity canister
 dfx canister install identity --mode=reinstall --argument '(record { verification_code_sender_principals = vec { principal "tu45y-p4p3d-b4gg4-gmyy3-rgweo-whsrq-fephi-vshrn-cipca-xdkri-pae" } })'
 
+// Initialize the random salt used when creating key delegations
+dfx canister call identity init_salt '()'
+
 // Try to get the user's profile (NotFound expected)
 dfx canister call identity profile '(record {})'
 

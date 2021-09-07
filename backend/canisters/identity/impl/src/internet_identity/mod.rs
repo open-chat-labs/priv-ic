@@ -179,9 +179,9 @@ fn get_delegation(
     session_key: SessionKey,
     expiration: Timestamp,
 ) -> GetDelegationResponse {
-    let principal = caller();
-
     check_frontend_length(&frontend);
+
+    let principal = caller();
 
     STATE.with(|state| {
         match get_signature(
