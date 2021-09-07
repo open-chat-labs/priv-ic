@@ -13,9 +13,7 @@ aws-sdk-sns = { git = "https://github.com/awslabs/aws-sdk-rust", tag = "v0.0.16-
 candid = "0.7.6"
 dotenv = "0.15.0"
 env_logger = "0.9.0"
-lambda_runtime = "0.4.0"
 log = "0.4.14"
-serde = "1.0.130"
 tokio = "1.11.0"
 types = { path = "../../../libraries/types" }
 verification_code_sender = { path = "../core" }
