@@ -3,6 +3,7 @@
     import Input from "./Input.svelte";
     import { createEventDispatcher } from "svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
+    import { registerAttributeErrorString } from "../domain/identity/identity";
     const dispatch = createEventDispatcher();
     export let error: string | undefined = undefined;
     export let serviceContainer: ServiceContainer;
@@ -13,18 +14,19 @@
     function registerEmailAddress(e: Event) {
         e.preventDefault();
         registering = true;
+        error = undefined;
         serviceContainer
             .registerEmailAddress(emailAddress)
             .then((resp) => {
                 if (resp.kind === "register_attribute_success") {
                     dispatch("registeredEmailAddress", {
                         id: resp.id,
-                        status: "pending",
+                        status: "sent",
                         added: BigInt(+new Date()),
                         value: emailAddress,
                     });
                 } else {
-                    console.log("todo - handle errors");
+                    error = registerAttributeErrorString(resp);
                 }
             })
             .finally(() => (registering = false));
@@ -49,6 +51,11 @@
             >Register</Button>
     </div>
 </div>
+{#if error !== undefined}
+    <div class="error">
+        {error}
+    </div>
+{/if}
 
 <style type="text/scss">
     :global(.email-address button) {
@@ -67,5 +74,10 @@
         .actions {
             flex: 0 0 100px;
         }
+    }
+    .error {
+        padding: $sp3;
+        color: darkred;
+        @include font(light, normal, fs-100);
     }
 </style>

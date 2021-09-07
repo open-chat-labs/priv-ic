@@ -3,11 +3,13 @@
     import Input from "./Input.svelte";
     import TrashCanOutline from "svelte-material-icons/TrashCanOutline.svelte";
     import CheckCircleOutline from "svelte-material-icons/CheckCircleOutline.svelte";
+    import SendCircleOutline from "svelte-material-icons/SendCircleOutline.svelte";
     import Refresh from "svelte-material-icons/Refresh.svelte";
     import HoverIcon from "./HoverIcon.svelte";
     import { fade } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
+    import { confirmCodeErrorString } from "../domain/identity/identity";
     import type { Verifiable } from "../domain/identity/identity";
     import Link from "./Link.svelte";
     const dispatch = createEventDispatcher();
@@ -18,10 +20,12 @@
 
     let busy: boolean = false;
     let sendingCode: boolean = false;
+    let resendingCode: boolean = false;
     let confirmingCode: boolean = false;
     let codeValue: string = "";
 
     function sendVerificationCode() {
+        error = undefined;
         sendingCode = busy = true;
         serviceContainer
             .sendVerificationCode(attribute.id)
@@ -36,10 +40,15 @@
     }
 
     function resend() {
-        console.log("TODO - this doesn't do anything yet");
+        resendingCode = busy = true;
+        setTimeout(() => {
+            console.log("TODO - this doesn't do anything yet");
+            resendingCode = busy = false;
+        }, 1000);
     }
 
     function submitCode() {
+        error = undefined;
         confirmingCode = busy = true;
         serviceContainer
             .confirmVerificationCode(attribute.id, codeValue)
@@ -47,6 +56,8 @@
                 if (resp === "success") {
                     dispatch("codeVerified", attribute);
                     attribute.status = "verified";
+                } else if (resp === "code_incorrect") {
+                    error = confirmCodeErrorString(resp);
                 }
             })
             .finally(() => (confirmingCode = busy = false));
@@ -104,7 +115,6 @@
         {#if attribute.status === "sent"}
             <form on:submit|preventDefault={submitCode}>
                 <Input
-                    invalid={error !== undefined}
                     align="center"
                     autofocus={true}
                     bind:value={codeValue}
@@ -113,13 +123,23 @@
                     disabled={confirmingCode}
                     placeholder={"Enter code"} />
             </form>
-            <div class="resend" title="re-send code" on:click={resend}>
+            <div class="send" class:spin={confirmingCode} title="submit code" on:click={submitCode}>
                 <HoverIcon>
-                    <Refresh size={"1.5em"} color={"hotpink"} />
+                    <SendCircleOutline size={"1.5em"} color={"#999"} />
+                </HoverIcon>
+            </div>
+            <div class="resend" title="re-send code" on:click={resend} class:spin={resendingCode}>
+                <HoverIcon>
+                    <Refresh size={"1.5em"} color={"#999"} />
                 </HoverIcon>
             </div>
         {/if}
     </div>
+    {#if error !== undefined}
+        <div class="error">
+            {error}
+        </div>
+    {/if}
 </div>
 
 <style type="text/scss">
@@ -192,5 +212,15 @@
     .access {
         @include font(light, normal, fs-90);
         margin-left: $sp4;
+    }
+
+    .spin {
+        @include spin();
+    }
+
+    .error {
+        padding: $sp3;
+        color: darkred;
+        @include font(light, normal, fs-100);
     }
 </style>

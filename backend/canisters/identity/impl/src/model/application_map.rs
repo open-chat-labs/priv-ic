@@ -105,7 +105,7 @@ impl ApplicationMap {
     fn derive_app_user_id(&self, _user_id: &UserId, _domain_name: &str) -> AppUserId {
         // TODO:
         // Hardcoded with my dfx openchat identity
-        Principal::from_text("t3mli-46uhw-2flyo-aer5b-ip3pt-ij5jc-whvah-hcbbp-d7qli-emafc-aae")
+        Principal::from_text("lenfi-kkaku-kmbwr-sccjg-7i47q-bpz5o-i5vx7-cmpoj-sdvjf-vctfa-mae")
             .unwrap()
             .into()
     }

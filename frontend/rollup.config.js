@@ -77,6 +77,7 @@ export default {
             preventAssignment: true,
             "process.env.INTERNET_IDENTITY_URL": JSON.stringify(process.env.INTERNET_IDENTITY_URL),
             "process.env.NODE_ENV": process.env.NODE_ENV,
+            "process.env.IDENTITY_CANISTER_ID": process.env.IDENTITY_CANISTER_ID,
             "process.env.MOCK_SERVICES": !production && process.env.MOCK_SERVICES, // make double sure we don't release with mock data
         }),
 

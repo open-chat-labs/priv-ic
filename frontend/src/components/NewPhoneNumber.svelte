@@ -5,6 +5,7 @@
     import { createEventDispatcher } from "svelte";
     import { allCountries } from "country-telephone-data";
     import type { ServiceContainer } from "../services/serviceContainer";
+    import { registerAttributeErrorString } from "../domain/identity/identity";
     const dispatch = createEventDispatcher();
     export let error: string | undefined = undefined;
     export let serviceContainer: ServiceContainer;
@@ -15,6 +16,7 @@
 
     function registerPhoneNumber(e: Event) {
         e.preventDefault();
+        error = undefined;
         registering = true;
         serviceContainer
             .registerPhoneNumber({ countryCode, number: phoneNumber })
@@ -22,12 +24,12 @@
                 if (resp.kind === "register_attribute_success") {
                     dispatch("registeredPhoneNumber", {
                         id: resp.id,
-                        status: "pending",
+                        status: "sent",
                         added: BigInt(+new Date()),
                         value: { countryCode, number: phoneNumber },
                     });
                 } else {
-                    console.log("todo - handle errors");
+                    error = registerAttributeErrorString(resp);
                 }
             })
             .finally(() => (registering = false));
@@ -61,6 +63,11 @@
             >Register</Button>
     </div>
 </div>
+{#if error !== undefined}
+    <div class="error">
+        {error}
+    </div>
+{/if}
 
 <style type="text/scss">
     :global(.phone-number button) {
@@ -83,5 +90,10 @@
         .actions {
             flex: 0 0 100px;
         }
+    }
+    .error {
+        padding: $sp3;
+        color: darkred;
+        @include font(light, normal, fs-100);
     }
 </style>

@@ -171,6 +171,13 @@ export type RegisterAttributeInvalid = {
     kind: "register_attribute_invalid";
 };
 
+export function registerAttributeErrorString(resp: RegisterAttributeResponse): string | undefined {
+    if (resp.kind === "register_attribute_success") return undefined;
+    if (resp.kind === "register_attribute_already_registered")
+        return "This attribute is already registered";
+    if (resp.kind === "register_attribute_invalid") return "This attribute is not valid";
+}
+
 export type SendCodeResponse =
     | "success"
     | "already_sent"
@@ -188,6 +195,17 @@ export type ConfirmCodeResponse =
     | "not_sent"
     | "identity_not_found"
     | "attribute_not_found";
+
+export function confirmCodeErrorString(resp: ConfirmCodeResponse): string | undefined {
+    if (resp === "success") return undefined;
+    if (resp === "code_incorrect") return "That code doesn't look right";
+    if (resp === "code_invalid") return "That code is invalid";
+    if (resp === "code_expired") return "That code has expired";
+    if (resp === "already_verified") return "That code has already been verified";
+    if (resp === "not_sent") return "We haven't sent a code for this attribute";
+    if (resp === "identity_not_found") return "Identity not found";
+    if (resp === "attribute_not_found") return "Attribute not found";
+}
 
 export type VisibleProfileAttributesResponse = "application_not_registered" | bigint[];
 

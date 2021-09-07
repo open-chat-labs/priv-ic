@@ -2,16 +2,15 @@
 2. OpenChat sends privIC a sign-in message including any attribute requirements
 3. privIC signs-in with II
 4. privIC frontend calls backend to get user profile and any visible attributes for OpenChat
-4.1 If the application is not registered then call to register it
-4.2 If the application requirements are not met then prompt user for missing attributes
-4.3 If/once the application requirements are met then send a message to OpenChat with the delegation which will close the privIC iframe
+   4.1 If the application is not registered then call to register it
+   4.2 If the application requirements are not met then prompt user for missing attributes
+   4.3 If/once the application requirements are met then send a message to OpenChat with the delegation which will close the privIC iframe
 
-* privIC can derive a principal for the app from the user's II principal + app_domain_name
-
+- privIC can derive a principal for the app from the user's II principal + app_domain_name
 
 TODO
-- Ideally in UI when an app is selected should only show those attributes that an app has requested access to
 
+- Ideally in UI when an app is selected should only show those attributes that an app has requested access to
 
 // Manual TEST steps
 
@@ -43,7 +42,7 @@ dfx canister call identity register_application '(record { app_domain_name = "op
 dfx --identity=openchat canister call identity app_profile '(record {})'
 
 // Set the user's email as visible to openchat
-dfx canister call identity set_visible_attributes  '(record { app_domain_name = "open.chat"; attributes = vec {130_484_264_696_462_419_966_595_822_519_662_664_456}})'
+dfx canister call identity set_visible_attributes '(record { app_domain_name = "open.chat"; attributes = vec {130_484_264_696_462_419_966_595_822_519_662_664_456}})'
 
 // Get the user's visible attributes for openchat
 dfx canister call identity visible_attributes '(record { app_domain_name = "open.chat"})'

@@ -13,7 +13,10 @@ const dataRequest = extractDataRequest();
 const authClient = dataRequest ? Middleman.create() : AuthClient.create();
 
 export function getIdentity(): Promise<Identity> {
-    return authClient.then((c) => c.getIdentity());
+    return authClient.then((c) => {
+        console.log("PrivIC Principal", c.getIdentity().getPrincipal().toText());
+        return c.getIdentity();
+    });
 }
 
 export function isAuthenticated(): Promise<boolean> {
@@ -34,6 +37,7 @@ export function login(): Promise<Identity> {
             c.login({
                 identityProvider: IDENTITY_URL,
                 onSuccess: () => {
+                    console.log("PrivIC Principal", c.getIdentity().getPrincipal().toText());
                     resolve(c.getIdentity());
                 },
                 onError: (err) => reject(err),

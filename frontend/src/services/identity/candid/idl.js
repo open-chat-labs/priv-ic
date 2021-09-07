@@ -168,7 +168,7 @@ export const idlFactory = ({ IDL }) => {
     'ext_verification_codes' : IDL.Func(
         [VerificationCodesArgs],
         [VerificationCodesResponse],
-        [],
+        ['query'],
       ),
     'profile' : IDL.Func([ProfileArgs], [ProfileResponse], ['query']),
     'register_application' : IDL.Func(
