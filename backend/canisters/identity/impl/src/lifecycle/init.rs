@@ -12,6 +12,6 @@ fn init(args: Args) {
         let data = Data::new(args.verification_code_sender_principals);
         let runtime_state = RuntimeState::new(env, data);
 
-        *state.borrow_mut() = Some(runtime_state);
+        *state.borrow_mut() = runtime_state;
     });
 }

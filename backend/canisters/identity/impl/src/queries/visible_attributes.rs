@@ -4,7 +4,7 @@ use identity_canister_api::visible_attributes::{Response::*, *};
 
 #[query]
 fn visible_attributes(args: Args) -> Response {
-    RUNTIME_STATE.with(|state| visible_attributes_impl(args, state.borrow().as_ref().unwrap()))
+    RUNTIME_STATE.with(|state| visible_attributes_impl(args, &state.borrow()))
 }
 
 fn visible_attributes_impl(args: Args, runtime_state: &RuntimeState) -> Response {

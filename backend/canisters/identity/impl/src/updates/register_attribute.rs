@@ -8,7 +8,7 @@ use types::{AttributeValue, VerificationCode};
 
 #[update]
 fn register_attribute(args: Args) -> Response {
-    RUNTIME_STATE.with(|state| register_attribute_impl(args, state.borrow_mut().as_mut().unwrap()))
+    RUNTIME_STATE.with(|state| register_attribute_impl(args, &mut state.borrow_mut()))
 }
 
 fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {

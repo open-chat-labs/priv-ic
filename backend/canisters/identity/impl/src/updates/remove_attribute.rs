@@ -4,7 +4,7 @@ use identity_canister_api::remove_attribute::{Response::*, *};
 
 #[update]
 fn remove_attribute(args: Args) -> Response {
-    RUNTIME_STATE.with(|state| remove_attribute_impl(args, state.borrow_mut().as_mut().unwrap()))
+    RUNTIME_STATE.with(|state| remove_attribute_impl(args, &mut state.borrow_mut()))
 }
 
 fn remove_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {

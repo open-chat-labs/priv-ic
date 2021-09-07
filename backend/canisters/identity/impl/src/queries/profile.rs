@@ -9,7 +9,7 @@ use types::{Application, TimestampMillis};
 
 #[query]
 fn profile(_args: Args) -> Response {
-    RUNTIME_STATE.with(|state| profile_impl(state.borrow().as_ref().unwrap()))
+    RUNTIME_STATE.with(|state| profile_impl(&state.borrow()))
 }
 
 fn profile_impl(runtime_state: &RuntimeState) -> Response {
