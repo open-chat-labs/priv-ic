@@ -8,6 +8,11 @@
 
 * privIC can derive a principal for the app from the user's II principal + app_domain_name
 
+
+TODO
+- Ideally in UI when an app is selected should only show those attributes that an app has requested access to
+
+
 // Manual TEST steps
 
 // Initial build/install privIC identity canister

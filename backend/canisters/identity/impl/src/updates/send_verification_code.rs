@@ -13,7 +13,6 @@ fn send_verification_code(args: Args) -> Response {
 fn send_verification_code_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {
     let user_id = runtime_state.env.caller().into();
     let now = runtime_state.env.now();
-    let verification_code = runtime_state.new_verification_code();
 
     let identity = match runtime_state.data.identities.get_mut(&user_id) {
         None => return IdentityNotFound,
@@ -34,6 +33,7 @@ fn send_verification_code_impl(args: Args, runtime_state: &mut RuntimeState) -> 
         VerificationCodeStatus::Verified(_) => return AlreadyVerified,
     };
 
+    let verification_code = runtime_state.env.new_verification_code();
     let status = VerificationCodeStatus::Sent(VerificationCodeSentState {
         code: verification_code.clone(),
         date: now,

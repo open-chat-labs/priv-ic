@@ -1,7 +1,7 @@
 use candid::Principal;
 
+mod app_user_id;
 mod application;
-mod application_id;
 mod attribute_id;
 mod attribute_value;
 mod error;
@@ -10,8 +10,8 @@ mod phone_number;
 mod user_id;
 mod verification_code;
 
+pub use app_user_id::*;
 pub use application::*;
-pub use application_id::*;
 pub use attribute_id::*;
 pub use attribute_value::*;
 pub use error::*;
