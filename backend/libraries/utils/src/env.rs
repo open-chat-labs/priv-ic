@@ -27,7 +27,6 @@ impl dyn Environment {
 
     pub fn new_verification_code(&mut self) -> String {
         format!("{:0>4}", self.random_u32() % 10000)
-
     }
 }
 
