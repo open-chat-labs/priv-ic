@@ -18,13 +18,13 @@ impl ApplicationMap {
     pub fn register(&mut self, user_id: UserId, domain_name: String) -> bool {
         let app_user_id = self.derive_app_user_id(&user_id, &domain_name);
         // Insert a user if it doesn't exist or get current set of application domains
-        let applications = match self.apps_by_user.entry(user_id) {
+        let user_apps = match self.apps_by_user.entry(user_id) {
             Occupied(e) => e.into_mut(),
             Vacant(e) => e.insert(HashMap::default()),
         };
 
         // Insert the application and return false if it is already registered
-        if applications.insert(domain_name, app_user_id).is_some() {
+        if user_apps.insert(domain_name, app_user_id).is_some() {
             return false;
         }
 
@@ -47,6 +47,18 @@ impl ApplicationMap {
         self.app_attributes.insert(app_user_id, attribute_set);
         true
     }
+
+    pub fn remove_attribute(&mut self, user_id: &UserId, attribute_id: &AttributeId) {
+        let user_app_ids = match self.apps_by_user.get(user_id) {
+            None => return,
+            Some(apps) => apps.values(),
+        };
+
+        for user_app_id in user_app_ids {
+            if let Some(attributes) = self.app_attributes.get_mut(user_app_id) {
+                attributes.remove(attribute_id);
+            }
+        }
     }
 
     pub fn domains(&self, user_id: UserId) -> Vec<String> {

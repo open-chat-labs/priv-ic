@@ -22,8 +22,8 @@ impl Identity {
         self.attributes.insert(attribute.id(), attribute);
     }
 
-    pub fn remove(&mut self, attribute_id: AttributeId) -> bool {
-        self.attributes.remove(&attribute_id).is_some()
+    pub fn remove(&mut self, attribute_id: &AttributeId) -> bool {
+        self.attributes.remove(attribute_id).is_some()
     }
 }
 
