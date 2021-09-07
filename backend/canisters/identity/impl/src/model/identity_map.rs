@@ -1,7 +1,7 @@
 use crate::model::identity::{Attribute, Identity};
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::{HashMap, HashSet};
-use types::{PhoneNumber, UserId};
+use types::{AttributeId, PhoneNumber, UserId};
 
 #[derive(Default)]
 pub struct IdentityMap {
@@ -40,5 +40,26 @@ impl IdentityMap {
 
         identity.add(attribute);
         true
+    }
+
+    pub fn remove_attribute(&mut self, user_id: &UserId, attribute_id: &AttributeId) -> bool {
+        match self.identities.get_mut(user_id) {
+            None => false,
+            Some(identity) => match identity.get(attribute_id) {
+                None => false,
+                Some(attribute) => {
+                    match attribute {
+                        Attribute::PhoneNumber(va) => {
+                            self.registered_phone_numbers.remove(&va.value);
+                        }
+                        Attribute::EmailAddress(va) => {
+                            self.registered_email_addresses.remove(&va.value);
+                        }
+                    };
+                    identity.remove(attribute_id);
+                    true
+                }
+            },
+        }
     }
 }
