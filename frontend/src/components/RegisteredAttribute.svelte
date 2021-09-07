@@ -118,8 +118,8 @@
                     align="center"
                     autofocus={true}
                     bind:value={codeValue}
-                    minlength={6}
-                    maxlength={6}
+                    minlength={4}
+                    maxlength={4}
                     disabled={confirmingCode}
                     placeholder={"Enter code"} />
             </form>

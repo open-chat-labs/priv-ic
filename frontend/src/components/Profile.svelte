@@ -16,15 +16,18 @@
         ClientApp as ClientAppType,
     } from "../domain/identity/identity";
 
+    import CheckCircleOutline from "svelte-material-icons/CheckCircleOutline.svelte";
+    import CloseCircleOutline from "svelte-material-icons/CloseCircleOutline.svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
     import Loading from "./Loading.svelte";
     import NewPhoneNumber from "./NewPhoneNumber.svelte";
     import ClientApp from "./ClientApp.svelte";
     import NewEmailAddress from "./NewEmailAddress.svelte";
     import RegisteredAttribute from "./RegisteredAttribute.svelte";
-    import type { DataRequest } from "../domain/requirements/requirements";
+    import type { DataRequest, DataRequirement } from "../domain/requirements/requirements";
     import { returnToClient } from "../services/auth";
     import Link from "./Link.svelte";
+    import { UnsupportedValueError } from "../utils/error";
 
     export let serviceContainer: ServiceContainer;
     export let dataRequest: DataRequest | undefined = undefined;
@@ -33,31 +36,83 @@
     let addingEmail: boolean = false;
     let loadingAppProfile: boolean = false;
     let visibleAttributes: bigint[] = [];
+    let requirementsMet: boolean = dataRequest === undefined ? true : false;
+    let requirements: Requirement[] = [];
+
+    type Requirement = {
+        message: string;
+        met: boolean;
+    };
 
     $: selectedApp = dataRequest ? { domainName: openchat } : undefined;
 
     $: {
-        if (areRequirementsMet(profile)) {
+        requirements = evaluateRequirements(visibleAttributes, profile, dataRequest);
+        requirementsMet = !requirements.some((r) => !r.met);
+
+        if (requirementsMet) {
             returnToClient();
         }
     }
 
-    // todo - obviously this is nowhere near good enough for the general case
-    function areRequirementsMet(profile: Profile | undefined): boolean {
-        if (dataRequest === undefined) return true;
-        if (profile === undefined) return false;
+    function evaluateRequirements(
+        visibleAttributes: bigint[],
+        profile: Profile | undefined,
+        dataRequest: DataRequest | undefined
+    ): Requirement[] {
+        if (dataRequest === undefined) return [];
+        if (profile === undefined) return [];
 
-        let met = true;
+        const requirements = [];
 
         if (dataRequest.requirements.phone !== undefined) {
-            met = met && profile.identity.phone.numbers.some((n) => n.status === "verified");
+            requirements.push({
+                message: requirementStringPerRequirement(
+                    "phone number",
+                    dataRequest.from,
+                    dataRequest.requirements.phone
+                ),
+                met:
+                    dataRequest.requirements.phone === "exists"
+                        ? profile.identity.phone.numbers.some((n) => n.status === "verified")
+                        : profile.identity.phone.numbers.some(
+                              (n) => n.status === "verified" && visibleAttributes.includes(n.id)
+                          ),
+            });
         }
 
         if (dataRequest.requirements.email !== undefined) {
-            met = met && profile.identity.email.addresses.some((a) => a.status === "verified");
+            requirements.push({
+                message: requirementStringPerRequirement(
+                    "email address",
+                    dataRequest.from,
+                    dataRequest.requirements.email
+                ),
+                met:
+                    dataRequest.requirements.email === "exists"
+                        ? profile.identity.email.addresses.some((n) => n.status === "verified")
+                        : profile.identity.email.addresses.some(
+                              (n) => n.status === "verified" && visibleAttributes.includes(n.id)
+                          ),
+            });
         }
 
-        return met;
+        return requirements;
+    }
+
+    function requirementStringPerRequirement(
+        attrName: string,
+        app: string,
+        req: DataRequirement
+    ): string {
+        if (req === "exists") {
+            return `You must have at least one verified ${attrName}. ${app} does not require access to this ${attrName}.`;
+        }
+
+        if (req === "full-access") {
+            return `You must grant ${app} access to at least one verified ${attrName}.`;
+        }
+        throw new UnsupportedValueError("Unexpected data requirement", req);
     }
 
     onMount(() => {
@@ -170,6 +225,29 @@
             {#if profile === undefined}
                 <Loading />
             {:else}
+                {#if dataRequest !== undefined && !requirementsMet}
+                    <section class="section">
+                        <div class="section-header">
+                            <h5 class="section-title">OpenChat</h5>
+                            <span class="section-subtitle"
+                                >requires some access to your personal data</span>
+                        </div>
+                        <div class="section-body client-apps">
+                            {#each requirements as req, i (req)}
+                                <div class="requirement">
+                                    <div class="met">
+                                        {#if req.met}
+                                            <CheckCircleOutline size={"1.5em"} color={"seagreen"} />
+                                        {:else}
+                                            <CloseCircleOutline size={"1.5em"} color={"darkred"} />
+                                        {/if}
+                                    </div>
+                                    <div class="msg">{req.message}</div>
+                                </div>
+                            {/each}
+                        </div>
+                    </section>
+                {/if}
                 {#if profile.apps.length > 0 && dataRequest === undefined}
                     <section class="section">
                         <div class="section-header">
@@ -367,6 +445,21 @@
 
         .client-apps {
             padding: $sp4;
+        }
+    }
+
+    .requirement {
+        display: flex;
+        @include font(book, normal, fs-90);
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $sp3;
+
+        .met {
+            flex: 0 0 35px;
+        }
+        .msg {
+            flex: auto;
         }
     }
 </style>
