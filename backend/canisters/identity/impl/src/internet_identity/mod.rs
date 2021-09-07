@@ -204,6 +204,14 @@ fn get_delegation(
     })
 }
 
+pub fn get_principal(caller: Principal, frontend: &FrontendHostname) -> Principal {
+    check_frontend_length(frontend);
+
+    let seed = calculate_seed(caller, frontend);
+    let public_key = der_encode_canister_sig_key(seed.to_vec());
+    Principal::self_authenticating(&public_key)
+}
+
 fn calculate_seed(principal: Principal, frontend: &FrontendHostname) -> Hash {
     let salt = STATE
         .with(|s| s.storage.borrow().salt().cloned())
