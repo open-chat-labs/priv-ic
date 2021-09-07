@@ -158,10 +158,7 @@ export const idlFactory = ({ IDL }) => {
     'attributes' : IDL.Vec(AttributeId),
     'app_domain_name' : IDL.Text,
   });
-  const SetVisibleAttributesResponse = IDL.Variant({
-    'Success' : IDL.Null,
-    'ApplicationNotRegistered' : IDL.Null,
-  });
+  const SetVisibleAttributesResponse = IDL.Variant({ 'Success' : IDL.Null });
   const VisibleAttributesArgs = IDL.Record({ 'app_domain_name' : IDL.Text });
   const VisibleAttributesSuccessResult = IDL.Record({
     'attributes' : IDL.Vec(AttributeId),
@@ -192,6 +189,7 @@ export const idlFactory = ({ IDL }) => {
         [GetDelegationResponse],
         ['query'],
       ),
+    'init_salt' : IDL.Func([], [], []),
     'prepare_delegation' : IDL.Func(
         [FrontendHostname, SessionKey, IDL.Opt(IDL.Nat64)],
         [UserKey, TimestampMillis],

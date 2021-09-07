@@ -92,8 +92,7 @@ export interface SetVisibleAttributesArgs {
   'attributes' : Array<AttributeId>,
   'app_domain_name' : string,
 }
-export type SetVisibleAttributesResponse = { 'Success' : null } |
-  { 'ApplicationNotRegistered' : null };
+export type SetVisibleAttributesResponse = { 'Success' : null };
 export interface SignedDelegation {
   'signature' : Array<number>,
   'delegation' : Delegation,
@@ -151,6 +150,7 @@ export interface _SERVICE {
       arg_1: SessionKey,
       arg_2: TimestampMillis,
     ) => Promise<GetDelegationResponse>,
+  'init_salt' : () => Promise<undefined>,
   'prepare_delegation' : (
       arg_0: FrontendHostname,
       arg_1: SessionKey,
