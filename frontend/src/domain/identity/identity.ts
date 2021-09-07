@@ -1,3 +1,5 @@
+import type { SignedDelegation } from "../../services/identity/candid/types";
+
 export const distrikt = "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/";
 export const openchat = "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/";
 export const dscvr = "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/";
@@ -210,3 +212,5 @@ export function confirmCodeErrorString(resp: ConfirmCodeResponse): string | unde
 export type VisibleProfileAttributesResponse = "application_not_registered" | bigint[];
 
 export type SetVisibleProfileAttributesResponse = "success";
+
+export type DelegationResponse = "no_such_delegation" | SignedDelegation;

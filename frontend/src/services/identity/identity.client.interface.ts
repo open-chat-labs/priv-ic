@@ -1,5 +1,6 @@
 import type {
     ConfirmCodeResponse,
+    DelegationResponse,
     PhoneNumber,
     Profile,
     RegisterAttributeResponse,
@@ -21,4 +22,14 @@ export interface IIdentityClient {
         domainName: string,
         attributes: bigint[]
     ): Promise<SetVisibleProfileAttributesResponse>;
+    prepareDelegation(
+        hostname: string,
+        key: Uint8Array,
+        maxTimeToLive?: bigint
+    ): Promise<[Uint8Array, bigint]>;
+    getDelegation(
+        hostname: string,
+        key: Uint8Array,
+        maxTimeToLive?: bigint
+    ): Promise<DelegationResponse>;
 }

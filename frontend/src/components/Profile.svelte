@@ -123,9 +123,16 @@
     }
 
     onMount(() => {
-        serviceContainer.getProfile().then((p) => {
-            profile = p;
-        });
+        serviceContainer
+            .getProfile()
+            .then((p) => {
+                alert(p);
+                profile = p;
+            })
+            .catch((_err) => {
+                console.log(_err);
+                alert(_err);
+            });
     });
 
     function registeredPhoneNumber(ev: CustomEvent<Verifiable<PhoneNumber>>) {

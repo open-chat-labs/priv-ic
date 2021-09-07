@@ -38,7 +38,15 @@ export type ConfirmVerificationCodeResponse = { 'AttributeNotFound' : null } |
   { 'VerificationCodeExpired' : null } |
   { 'IdentityNotFound' : null } |
   { 'VerificationCodeInvalid' : null };
+export interface Delegation {
+  'pubkey' : PublicKey,
+  'targets' : [] | [Array<Principal>],
+  'expiration' : TimestampMillis,
+}
 export interface EmailFacet { 'addresses' : Array<VerifiableEmailAddress> }
+export type FrontendHostname = string;
+export type GetDelegationResponse = { 'no_such_delegation' : null } |
+  { 'signed_delegation' : SignedDelegation };
 export interface Identity { 'email' : EmailFacet, 'phone' : PhoneFacet }
 export interface IndexedVerificationCode {
   'value' : VerificationCode,
@@ -56,6 +64,7 @@ export interface ProfileSuccessResult {
   'apps' : Array<Application>,
   'identity' : Identity,
 }
+export type PublicKey = Array<number>;
 export interface RegisterApplicationArgs { 'app_domain_name' : string }
 export type RegisterApplicationResponse = { 'AlreadyRegistered' : null } |
   { 'Success' : null };
@@ -78,13 +87,19 @@ export type SendVerificationCodeResponse = { 'AttributeNotFound' : null } |
   { 'AlreadyVerified' : null } |
   { 'IdentityNotFound' : null } |
   { 'AlreadySent' : null };
+export type SessionKey = PublicKey;
 export interface SetVisibleAttributesArgs {
   'attributes' : Array<AttributeId>,
   'app_domain_name' : string,
 }
 export type SetVisibleAttributesResponse = { 'Success' : null } |
   { 'ApplicationNotRegistered' : null };
+export interface SignedDelegation {
+  'signature' : Array<number>,
+  'delegation' : Delegation,
+}
 export type TimestampMillis = bigint;
+export type UserKey = PublicKey;
 export interface VerifiableEmailAddress {
   'id' : AttributeId,
   'status' : VerificationCodeStatus,
@@ -131,6 +146,16 @@ export interface _SERVICE {
   'ext_verification_codes' : (arg_0: VerificationCodesArgs) => Promise<
       VerificationCodesResponse
     >,
+  'get_delegation' : (
+      arg_0: FrontendHostname,
+      arg_1: SessionKey,
+      arg_2: TimestampMillis,
+    ) => Promise<GetDelegationResponse>,
+  'prepare_delegation' : (
+      arg_0: FrontendHostname,
+      arg_1: SessionKey,
+      arg_2: [] | [bigint],
+    ) => Promise<[UserKey, TimestampMillis]>,
   'profile' : (arg_0: ProfileArgs) => Promise<ProfileResponse>,
   'register_application' : (arg_0: RegisterApplicationArgs) => Promise<
       RegisterApplicationResponse

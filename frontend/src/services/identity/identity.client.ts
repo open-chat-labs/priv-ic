@@ -1,7 +1,9 @@
 import type { Identity } from "@dfinity/agent";
+import { blobFromUint8Array } from "@dfinity/candid";
 import { idlFactory, IdentityService } from "./candid/idl";
 import type {
     ConfirmCodeResponse,
+    DelegationResponse,
     PhoneNumber,
     Profile,
     RegisterAttributeResponse,
@@ -13,6 +15,7 @@ import type {
 import { CandidService } from "../candidService";
 import {
     confirmCodeResponse,
+    delegationResponse,
     profile,
     registerAttributeResponse,
     removeAttributeResponse,
@@ -39,6 +42,35 @@ export class IdentityClient extends CandidService implements IIdentityClient {
         }
         return new IdentityClient(identity);
     }
+
+    prepareDelegation(
+        hostname: string,
+        key: Uint8Array,
+        maxTimeToLive?: bigint
+    ): Promise<[Uint8Array, bigint]> {
+        const sessionKey = Array.from(blobFromUint8Array(key));
+        return this.handleResponse(
+            this.identityService.prepare_delegation(
+                hostname,
+                sessionKey,
+                maxTimeToLive ? [maxTimeToLive] : []
+            ),
+            ([k, t]) => [new Uint8Array(k), t]
+        );
+    }
+
+    getDelegation(
+        hostname: string,
+        key: Uint8Array,
+        maxTimeToLive: bigint
+    ): Promise<DelegationResponse> {
+        const sessionKey = Array.from(blobFromUint8Array(key));
+        return this.handleResponse(
+            this.identityService.get_delegation(hostname, sessionKey, maxTimeToLive),
+            delegationResponse
+        );
+    }
+
     getProfile(): Promise<Profile> {
         return this.handleResponse(this.identityService.profile({}), profile);
     }

@@ -71,9 +71,26 @@ export const idlFactory = ({ IDL }) => {
     'NotAuthorized' : IDL.Null,
     'Success' : VerificationCodesSuccessResult,
   });
+  const FrontendHostname = IDL.Text;
+  const PublicKey = IDL.Vec(IDL.Nat8);
+  const SessionKey = PublicKey;
+  const TimestampMillis = IDL.Nat64;
+  const Delegation = IDL.Record({
+    'pubkey' : PublicKey,
+    'targets' : IDL.Opt(IDL.Vec(IDL.Principal)),
+    'expiration' : TimestampMillis,
+  });
+  const SignedDelegation = IDL.Record({
+    'signature' : IDL.Vec(IDL.Nat8),
+    'delegation' : Delegation,
+  });
+  const GetDelegationResponse = IDL.Variant({
+    'no_such_delegation' : IDL.Null,
+    'signed_delegation' : SignedDelegation,
+  });
+  const UserKey = PublicKey;
   const ProfileArgs = IDL.Record({});
   const Application = IDL.Record({ 'domain_name' : IDL.Text });
-  const TimestampMillis = IDL.Nat64;
   const VerificationCodeStatus = IDL.Variant({
     'Sent' : TimestampMillis,
     'Verified' : TimestampMillis,
@@ -169,6 +186,16 @@ export const idlFactory = ({ IDL }) => {
         [VerificationCodesArgs],
         [VerificationCodesResponse],
         ['query'],
+      ),
+    'get_delegation' : IDL.Func(
+        [FrontendHostname, SessionKey, TimestampMillis],
+        [GetDelegationResponse],
+        ['query'],
+      ),
+    'prepare_delegation' : IDL.Func(
+        [FrontendHostname, SessionKey, IDL.Opt(IDL.Nat64)],
+        [UserKey, TimestampMillis],
+        [],
       ),
     'profile' : IDL.Func([ProfileArgs], [ProfileResponse], ['query']),
     'register_application' : IDL.Func(

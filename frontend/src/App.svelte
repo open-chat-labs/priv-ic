@@ -3,9 +3,9 @@
     import Loading from "./components/Loading.svelte";
     import Login from "./components/Login.svelte";
     import Profile from "./components/Profile.svelte";
-    import type { DataRequest, DataRequirement } from "./domain/requirements/requirements";
+    import type { DataRequest } from "./domain/requirements/requirements";
     import { extractDataRequest } from "./domain/requirements/requirements";
-    import { getIdentity, login, returnToClient } from "./services/auth";
+    import { getIdentity, login } from "./services/auth";
     import { ServiceContainer } from "./services/serviceContainer";
 
     let loginRequired: boolean = false;
@@ -18,6 +18,7 @@
         // II
         if (window.location.hash === "#authorize") {
             dataRequest = extractDataRequest();
+            console.log("about to login");
             startLogin();
             loginRequired = true;
             return;

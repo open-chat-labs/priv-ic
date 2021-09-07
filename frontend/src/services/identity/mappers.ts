@@ -12,6 +12,7 @@ import type {
     ApiVerificationCodeStatus,
     ApiSetVisibleAttributesResponse,
     ApiRemoveAttributeResponse,
+    ApiDelegationResponse,
 } from "./candid/idl";
 import {
     nullProfile,
@@ -28,6 +29,7 @@ import {
     VisibleProfileAttributesResponse,
     SetVisibleProfileAttributesResponse,
     RemoveAttributeResponse,
+    DelegationResponse,
 } from "../../domain/identity/identity";
 import { UnsupportedValueError } from "../../utils/error";
 
@@ -110,6 +112,16 @@ export function sendCodeResponse(candid: ApiSendVerificationCodeResponse): SendC
         "Unexpected send verification code response type returned",
         candid
     );
+}
+
+export function delegationResponse(candid: ApiDelegationResponse): DelegationResponse {
+    if ("no_such_delegation" in candid) {
+        return "no_such_delegation";
+    }
+    if ("signed_delegation" in candid) {
+        return candid.signed_delegation;
+    }
+    throw new UnsupportedValueError("Unexpected delegation response type returned", candid);
 }
 
 export function removeAttributeResponse(

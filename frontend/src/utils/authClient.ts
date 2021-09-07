@@ -13,6 +13,7 @@ import {
     Ed25519KeyIdentity,
 } from "@dfinity/identity";
 import type { Principal } from "@dfinity/principal";
+import { IdentityClient } from "../services/identity/identity.client";
 
 const KEY_LOCALSTORAGE_KEY = "identity";
 const KEY_LOCALSTORAGE_DELEGATION = "delegation";
@@ -208,13 +209,14 @@ export class AuthClient {
         private _idpWindow?: Window,
         // The event handler for processing events from the IdP.
         private _eventHandler?: (event: MessageEvent) => void,
-        private _authSuccess?: InternetIdentityAuthResponseSuccess
+        private _authSuccess?: InternetIdentityAuthResponseSuccess,
+        private _authRequest?: InternetIdentityAuthRequest
     ) {}
 
     private _handleSuccess(
         message: InternetIdentityAuthResponseSuccess,
         onSuccess?: () => void
-    ): InternetIdentityAuthResponseSuccess {
+    ): void {
         const delegations = message.delegations.map((signedDelegation) => {
             return {
                 delegation: new Delegation(
@@ -237,22 +239,12 @@ export class AuthClient {
         }
 
         this._chain = delegationChain;
+
         this._identity = DelegationIdentity.fromDelegation(key, this._chain);
 
         this._idpWindow?.close();
         onSuccess?.();
         this._removeEventListener();
-        return {
-            ...message,
-            delegations: delegations.map((d) => ({
-                delegation: {
-                    pubkey: new Uint8Array(d.delegation.pubkey),
-                    expiration: d.delegation.expiration,
-                    targets: d.delegation.targets,
-                },
-                signature: new Uint8Array(d.signature),
-            })),
-        };
     }
 
     public getIdentity(): Identity {
@@ -292,11 +284,45 @@ export class AuthClient {
         this._idpWindow = window.open(identityProviderUrl.toString(), "idpWindow") ?? undefined;
     }
 
-    public returnToClientApp(): void {
-        if (window.parent && this._authSuccess) {
+    private async createDelegation(): Promise<void> {
+        if (this._authRequest) {
+            const client = IdentityClient.create(this._identity);
+            const [userKey, ttl] = await client.prepareDelegation(
+                window.parent.origin,
+                this._authRequest?.sessionPublicKey,
+                this._authRequest?.maxTimeToLive
+            );
+            const signedDelegation = await client.getDelegation(window.parent.origin, userKey, ttl);
+            if (signedDelegation === "no_such_delegation") {
+                throw Error("Couldn't create delegation");
+            }
+
+            const parsed_signed_delegation = {
+                delegation: {
+                    pubkey: Uint8Array.from(signedDelegation.delegation.pubkey),
+                    expiration: BigInt(signedDelegation.delegation.expiration),
+                    targets: undefined,
+                },
+                signature: Uint8Array.from(signedDelegation.signature),
+            };
+
+            // todo do we need to add this to the list of delegations rather than just creating a new list
+            this._authSuccess = {
+                kind: "authorize-client-success",
+                delegations: [parsed_signed_delegation],
+                userPublicKey: Uint8Array.from(userKey),
+            };
+        }
+    }
+
+    public async returnToClientApp(): Promise<void> {
+        if (window.parent) {
             // todo - not restricting the origin here is very dodgy but it doesn't work otherwise
             // not sure why
-            window.parent.postMessage(this._authSuccess, "*");
+            await this.createDelegation();
+            if (this._authSuccess) {
+                window.parent.postMessage(this._authSuccess, "*");
+            }
         }
     }
 
@@ -309,13 +335,15 @@ export class AuthClient {
 
             const message = event.data as
                 | IdentityServiceResponseMessage
-                | {
-                      kind: "authorize-client";
-                  };
+                | InternetIdentityAuthRequest;
 
             console.log("received message in privIC: ", message);
             switch (message.kind) {
                 case "authorize-client": {
+                    // this comes from the calling system and contains the sessionPublicKey
+                    // and maxTTL that we will need later to create a delegation
+                    // so we need to tuck that away
+                    this._authRequest = message;
                     this._idpWindow?.postMessage(message, identityProviderUrl.origin);
                     break;
                 }
@@ -330,7 +358,7 @@ export class AuthClient {
                     // relay success back to the caller
                     // Create the delegation chain and store it.
                     try {
-                        this._authSuccess = this._handleSuccess(message, options?.onSuccess);
+                        this._handleSuccess(message, options?.onSuccess);
 
                         if (this._chain) {
                             await this._storage.set(

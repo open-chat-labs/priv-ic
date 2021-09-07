@@ -14,6 +14,7 @@ import {
     VisibleAttributesResponse,
     SetVisibleAttributesResponse,
     RemoveAttributeResponse,
+    GetDelegationResponse,
 } from "./types";
 export {
     _SERVICE as IdentityService,
@@ -30,6 +31,7 @@ export {
     VisibleAttributesResponse as ApiVisibleAttributesResponse,
     SetVisibleAttributesResponse as ApiSetVisibleAttributesResponse,
     RemoveAttributeResponse as ApiRemoveAttributeResponse,
+    GetDelegationResponse as ApiDelegationResponse,
 };
 
 export const idlFactory: IDL.InterfaceFactory;

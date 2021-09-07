@@ -14,6 +14,7 @@ import {
     openchat,
     dscvr,
     RemoveAttributeResponse,
+    DelegationResponse,
 } from "../../domain/identity/identity";
 import type { IIdentityClient } from "./identity.client.interface";
 import { v1 as uuidv1 } from "uuid";
@@ -56,6 +57,24 @@ export class IdentityClientMock implements IIdentityClient {
         } else {
             this._visibility = JSON.parse(cachedVis);
         }
+    }
+
+    prepareDelegation(
+        _hostname: string,
+        _key: Uint8Array,
+        _maxTimeToLive?: bigint
+    ): Promise<[Uint8Array, bigint]> {
+        // we can't really meaningfully mock this
+        throw new Error("Method not implemented.");
+    }
+
+    getDelegation(
+        _hostname: string,
+        _key: Uint8Array,
+        _maxTimeToLive?: bigint
+    ): Promise<DelegationResponse> {
+        // we can't really meaningfully mock this
+        throw new Error("Method not implemented.");
     }
 
     private save(): void {
