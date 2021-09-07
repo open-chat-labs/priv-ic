@@ -99,7 +99,7 @@
         </span>
         {#if attribute.status === "verified"}
             <span class="verified" title="Verified attribute">
-                <CheckCircleOutline size={"1.5em"} color={"seagreen"} />
+                <CheckCircleOutline size={"2em"} color={"seagreen"} />
             </span>
         {:else if attribute.status === "pending"}
             <span class="pending">
@@ -176,7 +176,6 @@
     }
 
     .attribute-row {
-        margin-bottom: $sp4;
         display: flex;
         justify-content: space-between;
         align-items: center;

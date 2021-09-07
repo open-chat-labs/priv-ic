@@ -31,6 +31,13 @@
 
     export let serviceContainer: ServiceContainer;
     export let dataRequest: DataRequest | undefined = undefined;
+    // export let dataRequest: DataRequest | undefined = {
+    //     from: "openchat",
+    //     requirements: {
+    //         phone: "full-access",
+    //         email: "exists",
+    //     },
+    // };
     let profile: Profile | undefined;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
@@ -184,10 +191,13 @@
         if (selectedApp) {
             const { domainName } = selectedApp;
             visibleAttributes = [ev.detail, ...visibleAttributes];
+            // todo - this doesn't work if the app is not registered yet
             serviceContainer.setVisibleProfileAttributes(domainName, visibleAttributes).then(() => {
                 serviceContainer.visibleProfileAttributes(domainName).then((resp) => {
                     if (resp !== "application_not_registered") {
                         visibleAttributes = resp;
+                    } else {
+                        alert(resp);
                     }
                 });
             });
@@ -198,6 +208,7 @@
         if (selectedApp) {
             const { domainName } = selectedApp;
             visibleAttributes = visibleAttributes.filter((attr) => attr !== ev.detail);
+            // todo - this doesn't work if the app is not registered yet
             serviceContainer.setVisibleProfileAttributes(domainName, visibleAttributes).then(() => {
                 serviceContainer.visibleProfileAttributes(domainName).then((resp) => {
                     if (resp !== "application_not_registered") {
@@ -210,22 +221,23 @@
 </script>
 
 <div class="wrapper">
-    <div class="left" />
     <main class="main">
         {#if dataRequest === undefined}
-            <h1 class="headline">Welcome to PrivIC</h1>
+            <div class="profile">
+                <h1 class="headline">Welcome to PrivIC</h1>
 
-            <p class="blurb">
-                All of your personal information in one place. You are in control of exactly which
-                personal information your favourite dApps have access to. See at a glance who is
-                using what and revoke access at any time.
-            </p>
+                <p class="blurb">
+                    All of your personal information in one place. You are in control of exactly
+                    which personal information your favourite dApps have access to. See at a glance
+                    who is using what and revoke access at any time.
+                </p>
+            </div>
         {/if}
         <div class="profile" class:loading={profile === undefined}>
             {#if profile === undefined}
                 <Loading />
             {:else}
-                {#if dataRequest !== undefined && !requirementsMet}
+                {#if dataRequest !== undefined}
                     <section class="section">
                         <div class="section-header">
                             <h5 class="section-title">OpenChat</h5>
@@ -248,6 +260,7 @@
                         </div>
                     </section>
                 {/if}
+
                 {#if profile.apps.length > 0 && dataRequest === undefined}
                     <section class="section">
                         <div class="section-header">
@@ -344,28 +357,12 @@
             {/if}
         </div>
     </main>
-    <div class="right">
-        <div class="right-inner" />
-    </div>
 </div>
 
 <style type="text/scss">
     .wrapper {
         display: flex;
-    }
-    .left,
-    .right {
-        @include fullHeight();
-        @include fullScreenImg("../assets/quiet.jpg");
-        flex: auto;
-        @include size-below(xs) {
-            display: none;
-        }
-    }
-
-    .right-inner {
-        height: 100%;
-        backdrop-filter: invert(1);
+        @include fullScreenImg("../assets/underwater.jpg");
     }
 
     .main {
@@ -376,21 +373,23 @@
         padding: 20px 50px 50px 50px;
         @include fullHeight();
         margin: auto;
-        background-color: #efefef;
+        background-color: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
         overflow: auto;
 
         @include size-below(xs) {
             padding: 0;
             flex: 1;
-            background-color: #ffffff;
+            background-color: #efefef;
         }
     }
 
     .profile {
         padding: $sp5;
-        background-color: #ffffff;
+        background-color: #efefef;
         @include box-shadow(1);
         border-radius: $sp4;
+        margin-bottom: $sp4;
 
         &.loading {
             min-height: 500px;
@@ -419,7 +418,7 @@
 
     .section {
         @include box-shadow(1);
-        background-color: #efefef;
+        background-color: #ffffff;
         border-radius: $sp3;
         margin-bottom: $sp4;
 
@@ -437,9 +436,6 @@
             .section-subtitle {
                 @include font(light, italic, fs-80);
                 padding: $sp3;
-            }
-            .icon {
-                flex: 0 0 20px;
             }
         }
 

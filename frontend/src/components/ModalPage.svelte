@@ -1,6 +1,13 @@
 <script lang="ts">
     export let minHeight: string | undefined = undefined;
-    export let bgClass: "locked" | "quiet" = "locked";
+    export let bgClass:
+        | "locked"
+        | "quiet"
+        | "woods"
+        | "flower"
+        | "jetty"
+        | "heather"
+        | "underwater" = "locked";
 </script>
 
 <div class={`modal-page ${bgClass}`}>
@@ -21,6 +28,26 @@
 
         &.quiet {
             @include fullScreenImg("../assets/quiet.jpg");
+        }
+
+        &.woods {
+            @include fullScreenImg("../assets/woods.jpg");
+        }
+
+        &.flower {
+            @include fullScreenImg("../assets/flower.jpg");
+        }
+
+        &.jetty {
+            @include fullScreenImg("../assets/jetty.jpg");
+        }
+
+        &.heather {
+            @include fullScreenImg("../assets/heather.jpg");
+        }
+
+        &.underwater {
+            @include fullScreenImg("../assets/underwater.jpg");
         }
 
         @include fullHeight();
