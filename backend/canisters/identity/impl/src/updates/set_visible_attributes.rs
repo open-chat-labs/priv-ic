@@ -4,8 +4,7 @@ use identity_canister_api::set_visible_attributes::{Response::*, *};
 
 #[update]
 fn set_visible_attributes(args: Args) -> Response {
-    RUNTIME_STATE
-        .with(|state| set_visible_attributes_impl(args, state.borrow_mut().as_mut().unwrap()))
+    RUNTIME_STATE.with(|state| set_visible_attributes_impl(args, &mut state.borrow_mut()))
 }
 
 fn set_visible_attributes_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {

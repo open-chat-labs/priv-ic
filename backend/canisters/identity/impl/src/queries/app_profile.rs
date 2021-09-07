@@ -7,7 +7,7 @@ use types::{AttributeId, PhoneNumber};
 
 #[query]
 fn app_profile(_args: Args) -> Response {
-    RUNTIME_STATE.with(|state| app_profile_impl(state.borrow().as_ref().unwrap()))
+    RUNTIME_STATE.with(|state| app_profile_impl(&state.borrow()))
 }
 
 fn app_profile_impl(runtime_state: &RuntimeState) -> Response {
