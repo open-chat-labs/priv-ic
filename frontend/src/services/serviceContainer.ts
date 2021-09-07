@@ -4,7 +4,9 @@ import type {
     PhoneNumber,
     Profile,
     RegisterAttributeResponse,
+    RemoveAttributeResponse,
     SendCodeResponse,
+    SetVisibleProfileAttributesResponse,
     VisibleProfileAttributesResponse,
 } from "../domain/identity/identity";
 import { IdentityClient } from "./identity/identity.client";
@@ -19,6 +21,10 @@ export class ServiceContainer {
 
     getProfile(): Promise<Profile> {
         return this._identityClient.getProfile();
+    }
+
+    removeAttribute(id: bigint): Promise<RemoveAttributeResponse> {
+        return this._identityClient.removeAttribute(id);
     }
 
     registerPhoneNumber(phoneNumber: PhoneNumber): Promise<RegisterAttributeResponse> {
@@ -39,5 +45,12 @@ export class ServiceContainer {
 
     visibleProfileAttributes(domainName: string): Promise<VisibleProfileAttributesResponse> {
         return this._identityClient.visibleProfileAttributes(domainName);
+    }
+
+    setVisibleProfileAttributes(
+        domainName: string,
+        attributes: bigint[]
+    ): Promise<SetVisibleProfileAttributesResponse> {
+        return this._identityClient.setVisibleProfileAttributes(domainName, attributes);
     }
 }

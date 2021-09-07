@@ -3,14 +3,25 @@
     import Loading from "./components/Loading.svelte";
     import Login from "./components/Login.svelte";
     import Profile from "./components/Profile.svelte";
-    import { getIdentity, login } from "./services/auth";
+    import type { DataRequest, DataRequirement } from "./domain/requirements/requirements";
+    import { extractDataRequest } from "./domain/requirements/requirements";
+    import { getIdentity, login, returnToClient } from "./services/auth";
     import { ServiceContainer } from "./services/serviceContainer";
 
     let loginRequired: boolean = false;
     let loginInProgress: boolean = false;
     let serviceContainer: ServiceContainer | undefined = undefined;
+    let dataRequest: DataRequest | undefined = undefined;
 
     onMount(() => {
+        // if we have #authorize in the hash fragment and we are not signed in, go straight to
+        // II
+        if (window.location.hash === "#authorize") {
+            dataRequest = extractDataRequest();
+            startLogin();
+            loginRequired = true;
+            return;
+        }
         getIdentity().then((id) => {
             if (id.getPrincipal().isAnonymous()) {
                 loginRequired = true;
@@ -41,9 +52,9 @@
 </script>
 
 {#if loginRequired}
-    <Login loading={loginInProgress} on:login={startLogin} />
+    <Login loading={loginInProgress} on:login={() => startLogin()} />
 {:else if serviceContainer !== undefined}
-    <Profile serviceContainer={getServiceContainer()} />
+    <Profile {dataRequest} serviceContainer={getServiceContainer()} />
 {:else}
     <Loading />
 {/if}

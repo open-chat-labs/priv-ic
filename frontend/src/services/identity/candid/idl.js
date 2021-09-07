@@ -2,30 +2,35 @@ export const idlFactory = ({ IDL }) => {
   const InitArgs = IDL.Record({
     'verification_code_sender_principals' : IDL.Vec(IDL.Principal),
   });
-  const AppProfileViewArgs = IDL.Record({});
-  const AppEmailAddress = IDL.Record({
+  const AppProfileArgs = IDL.Record({});
+  const AppVerifiableEmailAddress = IDL.Record({
     'verified' : IDL.Bool,
     'value' : IDL.Text,
   });
   const AppEmailFacet = IDL.Record({
     'any_verified' : IDL.Bool,
-    'addresses' : IDL.Vec(AppEmailAddress),
+    'attributes' : IDL.Vec(AppVerifiableEmailAddress),
   });
-  const AppPhoneNumber = IDL.Record({
+  const PhoneNumber = IDL.Record({
+    'country_code' : IDL.Nat16,
+    'number' : IDL.Text,
+  });
+  const AppVerifiablePhoneNumber = IDL.Record({
     'verified' : IDL.Bool,
-    'value' : IDL.Text,
+    'value' : PhoneNumber,
   });
   const AppPhoneFacet = IDL.Record({
     'any_verified' : IDL.Bool,
-    'numbers' : IDL.Vec(AppPhoneNumber),
+    'attributes' : IDL.Vec(AppVerifiablePhoneNumber),
   });
-  const AppProfileViewSuccessResult = IDL.Record({
+  const AppProfileSuccessResult = IDL.Record({
     'email' : AppEmailFacet,
     'phone' : AppPhoneFacet,
   });
-  const AppProfileViewResponse = IDL.Variant({
-    'NotFound' : IDL.Null,
-    'Success' : AppProfileViewSuccessResult,
+  const AppProfileResponse = IDL.Variant({
+    'Success' : AppProfileSuccessResult,
+    'IdentityNotFound' : IDL.Null,
+    'ApplicationNotRegistered' : IDL.Null,
   });
   const AttributeId = IDL.Nat;
   const ConfirmVerificationCodeArgs = IDL.Record({
@@ -67,7 +72,7 @@ export const idlFactory = ({ IDL }) => {
     'Success' : VerificationCodesSuccessResult,
   });
   const ProfileArgs = IDL.Record({});
-  const App = IDL.Record({ 'domain_name' : IDL.Text });
+  const Application = IDL.Record({ 'domain_name' : IDL.Text });
   const TimestampMillis = IDL.Nat64;
   const VerificationCodeStatus = IDL.Variant({
     'Sent' : TimestampMillis,
@@ -83,10 +88,6 @@ export const idlFactory = ({ IDL }) => {
   const EmailFacet = IDL.Record({
     'addresses' : IDL.Vec(VerifiableEmailAddress),
   });
-  const PhoneNumber = IDL.Record({
-    'country_code' : IDL.Nat16,
-    'number' : IDL.Text,
-  });
   const VerifiablePhoneNumber = IDL.Record({
     'id' : AttributeId,
     'status' : VerificationCodeStatus,
@@ -96,12 +97,17 @@ export const idlFactory = ({ IDL }) => {
   const PhoneFacet = IDL.Record({ 'numbers' : IDL.Vec(VerifiablePhoneNumber) });
   const Identity = IDL.Record({ 'email' : EmailFacet, 'phone' : PhoneFacet });
   const ProfileSuccessResult = IDL.Record({
-    'apps' : IDL.Vec(App),
+    'apps' : IDL.Vec(Application),
     'identity' : Identity,
   });
   const ProfileResponse = IDL.Variant({
     'NotFound' : IDL.Null,
     'Success' : ProfileSuccessResult,
+  });
+  const RegisterApplicationArgs = IDL.Record({ 'app_domain_name' : IDL.Text });
+  const RegisterApplicationResponse = IDL.Variant({
+    'AlreadyRegistered' : IDL.Null,
+    'Success' : IDL.Null,
   });
   const AttributeValue = IDL.Variant({
     'Email' : IDL.Text,
@@ -116,6 +122,12 @@ export const idlFactory = ({ IDL }) => {
     'Success' : RegisterAttributeSuccessResult,
     'InvalidValue' : IDL.Null,
   });
+  const RemoveAttributeArgs = IDL.Record({ 'attribute_id' : AttributeId });
+  const RemoveAttributeResponse = IDL.Variant({
+    'AttributeNotFound' : IDL.Null,
+    'Success' : IDL.Null,
+    'IdentityNotFound' : IDL.Null,
+  });
   const SendVerificationCodeArgs = IDL.Record({ 'attribute_id' : AttributeId });
   const SendVerificationCodeResponse = IDL.Variant({
     'AttributeNotFound' : IDL.Null,
@@ -125,29 +137,24 @@ export const idlFactory = ({ IDL }) => {
     'IdentityNotFound' : IDL.Null,
     'AlreadySent' : IDL.Null,
   });
-  const SetVisibleProfileAttributesArgs = IDL.Record({
+  const SetVisibleAttributesArgs = IDL.Record({
     'attributes' : IDL.Vec(AttributeId),
     'app_domain_name' : IDL.Text,
   });
-  const SetVisibleProfileAttributesResponse = IDL.Variant({
+  const SetVisibleAttributesResponse = IDL.Variant({
     'Success' : IDL.Null,
+    'ApplicationNotRegistered' : IDL.Null,
   });
-  const VisibleProfileAttributesArgs = IDL.Record({
-    'app_domain_name' : IDL.Text,
-  });
-  const VisibleProfileAttributesSuccessResult = IDL.Record({
+  const VisibleAttributesArgs = IDL.Record({ 'app_domain_name' : IDL.Text });
+  const VisibleAttributesSuccessResult = IDL.Record({
     'attributes' : IDL.Vec(AttributeId),
   });
-  const VisibleProfileAttributesResponse = IDL.Variant({
-    'NotFound' : IDL.Null,
-    'Success' : VisibleProfileAttributesSuccessResult,
+  const VisibleAttributesResponse = IDL.Variant({
+    'Success' : VisibleAttributesSuccessResult,
+    'ApplicationNotRegistered' : IDL.Null,
   });
   return IDL.Service({
-    'app_profile_view' : IDL.Func(
-        [AppProfileViewArgs],
-        [AppProfileViewResponse],
-        ['query'],
-      ),
+    'app_profile' : IDL.Func([AppProfileArgs], [AppProfileResponse], ['query']),
     'confirm_verification_code' : IDL.Func(
         [ConfirmVerificationCodeArgs],
         [ConfirmVerificationCodeResponse],
@@ -164,9 +171,19 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'profile' : IDL.Func([ProfileArgs], [ProfileResponse], ['query']),
+    'register_application' : IDL.Func(
+        [RegisterApplicationArgs],
+        [RegisterApplicationResponse],
+        [],
+      ),
     'register_attribute' : IDL.Func(
         [RegisterAttributeArgs],
         [RegisterAttributeResponse],
+        [],
+      ),
+    'remove_attribute' : IDL.Func(
+        [RemoveAttributeArgs],
+        [RemoveAttributeResponse],
         [],
       ),
     'send_verification_code' : IDL.Func(
@@ -174,14 +191,14 @@ export const idlFactory = ({ IDL }) => {
         [SendVerificationCodeResponse],
         [],
       ),
-    'set_visible_profile_attributes' : IDL.Func(
-        [SetVisibleProfileAttributesArgs],
-        [SetVisibleProfileAttributesResponse],
+    'set_visible_attributes' : IDL.Func(
+        [SetVisibleAttributesArgs],
+        [SetVisibleAttributesResponse],
         [],
       ),
-    'visible_profile_attributes' : IDL.Func(
-        [VisibleProfileAttributesArgs],
-        [VisibleProfileAttributesResponse],
+    'visible_attributes' : IDL.Func(
+        [VisibleAttributesArgs],
+        [VisibleAttributesResponse],
         ['query'],
       ),
   });

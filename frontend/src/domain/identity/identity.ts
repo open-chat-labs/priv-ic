@@ -1,7 +1,11 @@
+export const distrikt = "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/";
+export const openchat = "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/";
+export const dscvr = "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/";
+
 export const appLookup: Record<string, string> = {
-    "https://az5sd-cqaaa-aaaae-aaarq-cai.ic0.app/": "Distrikt",
-    "https://7e6iv-biaaa-aaaaf-aaada-cai.ic0.app/": "OpenChat",
-    "https://h5aet-waaaa-aaaab-qaamq-cai.raw.ic0.app/": "Dscvr",
+    [distrikt]: "Distrikt",
+    [openchat]: "OpenChat",
+    [dscvr]: "Dscvr",
 };
 
 export const nullProfile: Profile = {
@@ -31,6 +35,54 @@ export function removeEmailAddress(profile: Profile, id: bigint): Profile {
             ...profile.identity,
             email: {
                 addresses: profile.identity.email.addresses.filter((n) => n.id !== id),
+            },
+        },
+    };
+}
+
+export function updatePhoneStatus(
+    profile: Profile,
+    id: bigint,
+    status: VerificationCodeStatus
+): Profile {
+    return {
+        ...profile,
+        identity: {
+            ...profile.identity,
+            phone: {
+                numbers: profile.identity.phone.numbers.map((n) => {
+                    if (n.id === id) {
+                        return {
+                            ...n,
+                            status,
+                        };
+                    }
+                    return n;
+                }),
+            },
+        },
+    };
+}
+
+export function updateEmailStatus(
+    profile: Profile,
+    id: bigint,
+    status: VerificationCodeStatus
+): Profile {
+    return {
+        ...profile,
+        identity: {
+            ...profile.identity,
+            email: {
+                addresses: profile.identity.email.addresses.map((n) => {
+                    if (n.id === id) {
+                        return {
+                            ...n,
+                            status,
+                        };
+                    }
+                    return n;
+                }),
             },
         },
     };
@@ -96,6 +148,11 @@ export type Verifiable<T> = {
 
 export type VerificationCodeStatus = "pending" | "sent" | "verified" | "expired";
 
+export type RemoveAttributeResponse =
+    | "remove_success"
+    | "remove_attribute_not_found"
+    | "remove_identity_not_found";
+
 export type RegisterAttributeResponse =
     | RegisterAttributeSuccess
     | RegisterAttributeAlreadyRegistered
@@ -132,4 +189,6 @@ export type ConfirmCodeResponse =
     | "identity_not_found"
     | "attribute_not_found";
 
-export type VisibleProfileAttributesResponse = "not_found" | bigint[];
+export type VisibleProfileAttributesResponse = "application_not_registered" | bigint[];
+
+export type SetVisibleProfileAttributesResponse = "success";

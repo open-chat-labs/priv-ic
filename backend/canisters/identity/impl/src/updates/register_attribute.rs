@@ -4,7 +4,7 @@ use crate::model::identity::{
 use crate::{RuntimeState, RUNTIME_STATE};
 use ic_cdk_macros::update;
 use identity_canister_api::register_attribute::{Response::*, *};
-use types::{AttributeId, AttributeValue};
+use types::{AttributeValue, VerificationCode};
 
 #[update]
 fn register_attribute(args: Args) -> Response {
@@ -12,7 +12,7 @@ fn register_attribute(args: Args) -> Response {
 }
 
 fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {
-    let caller = runtime_state.env.caller();
+    let user_id = runtime_state.env.caller().into();
     let now = runtime_state.env.now();
 
     let value = match args.value.try_normalise() {
@@ -20,9 +20,13 @@ fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Resp
         Some(v) => v,
     };
 
-    let attribute_id = AttributeId::new();
-    let code = format!("{:0>6}", runtime_state.env.random_u32());
-    let status = VerificationCodeStatus::Sent(VerificationCodeSentState { code, date: now });
+    let verification_code = runtime_state.new_verification_code();
+    let attribute_id = runtime_state.rand_u128().into();
+    let sent_state = VerificationCodeSentState {
+        code: verification_code.clone(),
+        date: now,
+    };
+    let status = VerificationCodeStatus::Sent(sent_state);
 
     let attribute = match value {
         AttributeValue::Email(address) => Attribute::EmailAddress(VerifiableAttribute::<String> {
@@ -41,12 +45,23 @@ fn register_attribute_impl(args: Args, runtime_state: &mut RuntimeState) -> Resp
         }
     };
 
-    match runtime_state
+    let verification_target = attribute.target();
+
+    if !runtime_state
         .data
         .identities
-        .try_register_attribute(caller, attribute)
+        .try_register_attribute(user_id, attribute)
     {
-        false => AlreadyRegistered,
-        true => Success(SuccessResult { attribute_id }),
+        return AlreadyRegistered;
     }
+
+    runtime_state
+        .data
+        .verifications_to_send
+        .add(VerificationCode {
+            code: verification_code,
+            target: verification_target,
+        });
+
+    Success(SuccessResult { attribute_id })
 }

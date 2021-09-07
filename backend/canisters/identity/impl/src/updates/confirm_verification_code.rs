@@ -9,14 +9,14 @@ fn confirm_verification_code(args: Args) -> Response {
 }
 
 fn confirm_verification_code_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {
-    let caller = runtime_state.env.caller();
     let now = runtime_state.env.now();
 
     if args.verification_code.len() > 8 {
         return VerificationCodeInvalid;
     }
 
-    let identity = match runtime_state.data.identities.get_by_principal_mut(&caller) {
+    let user_id = runtime_state.env.caller().into();
+    let identity = match runtime_state.data.identities.get_mut(&user_id) {
         None => return IdentityNotFound,
         Some(i) => i,
     };

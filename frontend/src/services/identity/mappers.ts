@@ -8,8 +8,10 @@ import type {
     ApiProfileResponse,
     ApiRegisterAttributeResponse,
     ApiSendVerificationCodeResponse,
+    ApiVisibleAttributesResponse,
     ApiVerificationCodeStatus,
-    ApiVisibleProfileAttributesResponse,
+    ApiSetVisibleAttributesResponse,
+    ApiRemoveAttributeResponse,
 } from "./candid/idl";
 import {
     nullProfile,
@@ -24,18 +26,26 @@ import {
     SendCodeResponse,
     ConfirmCodeResponse,
     VisibleProfileAttributesResponse,
+    SetVisibleProfileAttributesResponse,
+    RemoveAttributeResponse,
 } from "../../domain/identity/identity";
 import { UnsupportedValueError } from "../../utils/error";
 
+export function setVisibleProfileAttributesResponse(
+    _candid: ApiSetVisibleAttributesResponse
+): SetVisibleProfileAttributesResponse {
+    return "success";
+}
+
 export function visibleProfileAttributesResponse(
-    candid: ApiVisibleProfileAttributesResponse
+    candid: ApiVisibleAttributesResponse
 ): VisibleProfileAttributesResponse {
     if ("Success" in candid) {
         return candid.Success.attributes;
     }
 
-    if ("NotFound" in candid) {
-        return "not_found";
+    if ("ApplicationNotRegistered" in candid) {
+        return "application_not_registered";
     }
 
     throw new UnsupportedValueError(
@@ -100,6 +110,21 @@ export function sendCodeResponse(candid: ApiSendVerificationCodeResponse): SendC
         "Unexpected send verification code response type returned",
         candid
     );
+}
+
+export function removeAttributeResponse(
+    candid: ApiRemoveAttributeResponse
+): RemoveAttributeResponse {
+    if ("Success" in candid) {
+        return "remove_success";
+    }
+    if ("AttributeNotFound" in candid) {
+        return "remove_attribute_not_found";
+    }
+    if ("IdentityNotFound" in candid) {
+        return "remove_identity_not_found";
+    }
+    throw new UnsupportedValueError("Unexpected remove attribute response type returned", candid);
 }
 
 export function registerAttributeResponse(

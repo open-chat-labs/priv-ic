@@ -1,4 +1,5 @@
 use std::collections::{hash_map, HashMap};
+use types::VerificationCodeTarget;
 use types::{AttributeId, PhoneNumber, TimestampMillis};
 
 pub const VERIFICATION_CODE_EXPIRY_MILLIS: u64 = 60 * 60 * 1000; // 1 hour
@@ -9,6 +10,10 @@ pub struct Identity {
 }
 
 impl Identity {
+    pub fn get_mut(&mut self, id: &AttributeId) -> Option<&mut Attribute> {
+        self.attributes.get_mut(id)
+    }
+
     pub fn values(&self) -> hash_map::Values<'_, AttributeId, Attribute> {
         self.attributes.values()
     }
@@ -17,8 +22,8 @@ impl Identity {
         self.attributes.insert(attribute.id(), attribute);
     }
 
-    pub fn get_mut(&mut self, id: &AttributeId) -> Option<&mut Attribute> {
-        self.attributes.get_mut(id)
+    pub fn remove(&mut self, attribute_id: AttributeId) -> bool {
+        self.attributes.remove(&attribute_id).is_some()
     }
 }
 
@@ -51,6 +56,16 @@ impl Attribute {
         match self {
             Attribute::PhoneNumber(va) => &va.status,
             Attribute::EmailAddress(va) => &va.status,
+        }
+    }
+
+    pub fn target(&self) -> VerificationCodeTarget {
+        match self {
+            Attribute::PhoneNumber(va) => {
+                let number = format!("{} {}", va.value.country_code, va.value.number);
+                VerificationCodeTarget::Phone(number)
+            }
+            Attribute::EmailAddress(va) => VerificationCodeTarget::Phone(va.value.clone()),
         }
     }
 }

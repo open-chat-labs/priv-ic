@@ -5,24 +5,30 @@ use crate::{RuntimeState, RUNTIME_STATE};
 use candid::CandidType;
 use ic_cdk_macros::query;
 use identity_canister_api::profile::{Response::*, *};
-use types::TimestampMillis;
+use types::{Application, TimestampMillis};
 
 #[query]
-fn chunk(_args: Args) -> Response {
-    RUNTIME_STATE.with(|state| chunk_impl(&state.borrow()))
+fn profile(_args: Args) -> Response {
+    RUNTIME_STATE.with(|state| profile_impl(state.borrow().as_ref().unwrap()))
 }
 
-fn chunk_impl(runtime_state: &RuntimeState) -> Response {
-    match runtime_state
-        .data
-        .identities
-        .get_by_principal(&runtime_state.env.caller())
-    {
+fn profile_impl(runtime_state: &RuntimeState) -> Response {
+    let user_id = runtime_state.env.caller().into();
+    match runtime_state.data.identities.get(&user_id) {
         None => NotFound,
-        Some(identity) => Success(SuccessResult {
-            identity: map_identity(identity, runtime_state.env.now()),
-            apps: vec![],
-        }),
+        Some(internal_identity) => {
+            let identity = map_identity(internal_identity, runtime_state.env.now());
+            let apps = runtime_state
+                .data
+                .applications
+                .domains(user_id)
+                .iter()
+                .map(|domain_name| Application {
+                    domain_name: domain_name.clone(),
+                })
+                .collect();
+            Success(SuccessResult { identity, apps })
+        }
     }
 }
 
