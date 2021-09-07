@@ -10,6 +10,10 @@ pub struct Identity {
 }
 
 impl Identity {
+    pub fn get(&mut self, id: &AttributeId) -> Option<&Attribute> {
+        self.attributes.get(id)
+    }
+
     pub fn get_mut(&mut self, id: &AttributeId) -> Option<&mut Attribute> {
         self.attributes.get_mut(id)
     }
