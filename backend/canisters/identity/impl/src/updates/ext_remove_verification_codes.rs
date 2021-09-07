@@ -4,9 +4,7 @@ use identity_canister_api::ext_remove_verification_codes::{Response::*, *};
 
 #[update]
 fn ext_remove_verification_codes(args: Args) -> Response {
-    RUNTIME_STATE.with(|state| {
-        ext_remove_verification_codes_impl(args, state.borrow_mut().as_mut().unwrap())
-    })
+    RUNTIME_STATE.with(|state| ext_remove_verification_codes_impl(args, &mut state.borrow_mut()))
 }
 
 fn ext_remove_verification_codes_impl(args: Args, runtime_state: &mut RuntimeState) -> Response {

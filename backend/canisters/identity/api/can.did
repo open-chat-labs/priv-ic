@@ -1,4 +1,34 @@
-import "../../../libraries/types/can.did";
+type AttributeId = nat;
+type TimestampMillis = nat64;
+
+type Application =
+    record {
+        domain_name: text;
+    };
+
+type PhoneNumber = 
+    record {
+        country_code: nat16;
+        number: text;
+    };
+
+type IndexedVerificationCode =
+    record {
+        index: nat64;
+        value: VerificationCode;
+    };
+
+type VerificationCode =
+    record {
+        code: text;
+        target: VerificationCodeTarget;
+    };
+
+type VerificationCodeTarget =
+    variant {
+        Phone: text;
+        Email: text;
+    };
 
 type Identity = 
     record {
@@ -255,6 +285,6 @@ service: (InitArgs) -> {
     app_profile: (AppProfileArgs) -> (AppProfileResponse) query;
 
     //// Verification code sender
-    ext_verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse);
+    ext_verification_codes: (VerificationCodesArgs) -> (VerificationCodesResponse) query;
     ext_remove_verification_codes: (RemoveVerificationCodesArgs) -> (RemoveVerificationCodesResponse);
 }

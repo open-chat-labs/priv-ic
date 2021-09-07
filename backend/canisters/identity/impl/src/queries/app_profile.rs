@@ -7,14 +7,14 @@ use types::{AttributeId, PhoneNumber};
 
 #[query]
 fn app_profile(_args: Args) -> Response {
-    RUNTIME_STATE.with(|state| app_profile_impl(state.borrow().as_ref().unwrap()))
+    RUNTIME_STATE.with(|state| app_profile_impl(&state.borrow()))
 }
 
 fn app_profile_impl(runtime_state: &RuntimeState) -> Response {
-    let application_id = runtime_state.env.caller().into();
+    let app_user_id = runtime_state.env.caller().into();
 
-    // Lookup the user_id given the application_id
-    let user_id = match runtime_state.data.applications.user_id(&application_id) {
+    // Lookup the user_id given the app_user_id
+    let user_id = match runtime_state.data.applications.user_id(&app_user_id) {
         None => return ApplicationNotRegistered,
         Some(uid) => uid,
     };
@@ -29,7 +29,7 @@ fn app_profile_impl(runtime_state: &RuntimeState) -> Response {
     let attributes = match runtime_state
         .data
         .applications
-        .attributes_by_id(&application_id)
+        .attributes_by_id(&app_user_id)
     {
         None => return ApplicationNotRegistered,
         Some(attr) => attr,
