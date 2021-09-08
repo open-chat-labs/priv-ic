@@ -74,6 +74,7 @@ export const idlFactory = ({ IDL }) => {
   const FrontendHostname = IDL.Text;
   const PublicKey = IDL.Vec(IDL.Nat8);
   const SessionKey = PublicKey;
+  const TimestampNanos = IDL.Nat64;
   const TimestampMillis = IDL.Nat64;
   const Delegation = IDL.Record({
     'pubkey' : PublicKey,
@@ -88,6 +89,7 @@ export const idlFactory = ({ IDL }) => {
     'no_such_delegation' : IDL.Null,
     'signed_delegation' : SignedDelegation,
   });
+  const Nanoseconds = IDL.Nat64;
   const UserKey = PublicKey;
   const ProfileArgs = IDL.Record({});
   const Application = IDL.Record({ 'domain_name' : IDL.Text });
@@ -185,14 +187,14 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'get_delegation' : IDL.Func(
-        [FrontendHostname, SessionKey, TimestampMillis],
+        [FrontendHostname, SessionKey, TimestampNanos],
         [GetDelegationResponse],
         ['query'],
       ),
     'init_salt' : IDL.Func([], [], []),
     'prepare_delegation' : IDL.Func(
-        [FrontendHostname, SessionKey, IDL.Opt(IDL.Nat64)],
-        [UserKey, TimestampMillis],
+        [FrontendHostname, SessionKey, IDL.Opt(Nanoseconds)],
+        [UserKey, TimestampNanos],
         [],
       ),
     'profile' : IDL.Func([ProfileArgs], [ProfileResponse], ['query']),

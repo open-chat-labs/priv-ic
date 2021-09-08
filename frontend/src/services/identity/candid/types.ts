@@ -55,6 +55,7 @@ export interface IndexedVerificationCode {
 export interface InitArgs {
   'verification_code_sender_principals' : Array<Principal>,
 }
+export type Nanoseconds = bigint;
 export interface PhoneFacet { 'numbers' : Array<VerifiablePhoneNumber> }
 export interface PhoneNumber { 'country_code' : number, 'number' : string }
 export type ProfileArgs = {};
@@ -98,6 +99,7 @@ export interface SignedDelegation {
   'delegation' : Delegation,
 }
 export type TimestampMillis = bigint;
+export type TimestampNanos = bigint;
 export type UserKey = PublicKey;
 export interface VerifiableEmailAddress {
   'id' : AttributeId,
@@ -148,14 +150,14 @@ export interface _SERVICE {
   'get_delegation' : (
       arg_0: FrontendHostname,
       arg_1: SessionKey,
-      arg_2: TimestampMillis,
+      arg_2: TimestampNanos,
     ) => Promise<GetDelegationResponse>,
   'init_salt' : () => Promise<undefined>,
   'prepare_delegation' : (
       arg_0: FrontendHostname,
       arg_1: SessionKey,
-      arg_2: [] | [bigint],
-    ) => Promise<[UserKey, TimestampMillis]>,
+      arg_2: [] | [Nanoseconds],
+    ) => Promise<[UserKey, TimestampNanos]>,
   'profile' : (arg_0: ProfileArgs) => Promise<ProfileResponse>,
   'register_application' : (arg_0: RegisterApplicationArgs) => Promise<
       RegisterApplicationResponse

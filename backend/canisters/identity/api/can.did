@@ -1,8 +1,10 @@
 type AttributeId = nat;
 type FrontendHostname = text;
+type Nanoseconds = nat64;
 type PublicKey = blob;
 type SessionKey = PublicKey;
 type TimestampMillis = nat64;
+type TimestampNanos = nat64;
 type UserKey = PublicKey;
 
 type Application =
@@ -314,7 +316,7 @@ service: (InitArgs) -> {
     ext_remove_verification_codes: (RemoveVerificationCodesArgs) -> (RemoveVerificationCodesResponse);
 
     // Identity
-    prepare_delegation : (FrontendHostname, SessionKey, maxTimeToLive : opt nat64) -> (UserKey, TimestampMillis);
-    get_delegation: (FrontendHostname, SessionKey, TimestampMillis) -> (GetDelegationResponse) query;
+    prepare_delegation : (FrontendHostname, SessionKey, maxTimeToLive : opt Nanoseconds) -> (UserKey, TimestampNanos);
+    get_delegation: (FrontendHostname, SessionKey, TimestampNanos) -> (GetDelegationResponse) query;
     init_salt: () -> ();
 }
