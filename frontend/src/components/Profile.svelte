@@ -19,6 +19,7 @@
     import CheckCircleOutline from "svelte-material-icons/CheckCircleOutline.svelte";
     import CloseCircleOutline from "svelte-material-icons/CloseCircleOutline.svelte";
     import Refresh from "svelte-material-icons/Refresh.svelte";
+    import HoverIcon from "./HoverIcon.svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
     import Loading from "./Loading.svelte";
     import NewPhoneNumber from "./NewPhoneNumber.svelte";
@@ -29,6 +30,9 @@
     import Link from "./Link.svelte";
     import { UnsupportedValueError } from "../utils/error";
     import type { DataRequestWithOrigin, DataRequirement, DataResponse } from "../utils/authClient";
+    import Logout from "svelte-material-icons/Logout.svelte";
+    import { createEventDispatcher } from "svelte";
+    const dispatch = createEventDispatcher();
 
     export let serviceContainer: ServiceContainer;
     export let dataRequest: DataRequestWithOrigin | undefined = undefined;
@@ -256,7 +260,14 @@
     <main class="main">
         {#if dataRequest === undefined}
             <div class="profile">
-                <h1 class="headline">Welcome to PrivIC</h1>
+                <div class="header">
+                    <h1 class="headline">Welcome to PrivIC</h1>
+                    <span title="logout" class="logout" on:click={() => dispatch("logout")}>
+                        <HoverIcon>
+                            <Logout size={"1.6em"} color={"#aaa"} />
+                        </HoverIcon>
+                    </span>
+                </div>
 
                 <p class="blurb">
                     All of your personal information in one place. You are in control of exactly
@@ -509,5 +520,10 @@
         &.all-met {
             margin-top: $sp4;
         }
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
     }
 </style>

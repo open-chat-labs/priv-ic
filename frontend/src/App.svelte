@@ -3,7 +3,7 @@
     import Loading from "./components/Loading.svelte";
     import Login from "./components/Login.svelte";
     import Profile from "./components/Profile.svelte";
-    import { getIdentity, login } from "./services/auth";
+    import { getIdentity, login, logout } from "./services/auth";
     import { ServiceContainer } from "./services/serviceContainer";
     import type { DataRequestWithOrigin } from "./utils/authClient";
 
@@ -49,12 +49,18 @@
             serviceContainer = new ServiceContainer(id);
         });
     }
+
+    function performLogout() {
+        logout().then(() => {
+            loginRequired = true;
+        });
+    }
 </script>
 
 {#if loginRequired}
     <Login loading={loginInProgress} on:login={() => startLogin()} />
 {:else if serviceContainer !== undefined}
-    <Profile {dataRequest} serviceContainer={getServiceContainer()} />
+    <Profile on:logout={performLogout} {dataRequest} serviceContainer={getServiceContainer()} />
 {:else}
     <Loading />
 {/if}
