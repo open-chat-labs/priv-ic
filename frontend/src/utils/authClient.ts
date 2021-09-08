@@ -312,16 +312,14 @@ export class AuthClient {
 
     public async returnToClientApp(): Promise<void> {
         if (window.parent) {
-            // todo - not restricting the origin here is very dodgy but it doesn't work otherwise
-            // not sure why
             try {
                 await this.createDelegation();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 console.log("delegation error", err);
             }
-            if (this._authSuccess) {
-                window.parent.postMessage(this._authSuccess, "*");
+            if (this._authSuccess && this._callingOrigin) {
+                window.parent.postMessage(this._authSuccess, this._callingOrigin);
             }
         }
     }
@@ -334,8 +332,7 @@ export class AuthClient {
 
             const message = event.data as
                 | IdentityServiceResponseMessage
-                | InternetIdentityAuthRequest
-                | { kind: "pong"; origin: string };
+                | InternetIdentityAuthRequest;
 
             console.log("received message in privIC: ", message);
 
@@ -343,26 +340,19 @@ export class AuthClient {
                 case "authorize-client": {
                     // this comes from the calling system and contains the sessionPublicKey
                     // and maxTTL that we will need later to create a delegation
-                    // so we need to tuck that away
+                    // so we need to tuck that away, but not send it to II
                     this._authRequest = message;
-                    console.log("shouldn't see this now", message);
-                    this._idpWindow?.postMessage(message, identityProviderUrl.origin);
-                    break;
-                }
-
-                case "pong": {
-                    this._callingOrigin = message.origin;
+                    this._callingOrigin = event.origin;
+                    console.log(event.origin);
+                    console.log("auth request from open chat", message);
+                    // this._idpWindow?.postMessage(message, identityProviderUrl.origin);
                     break;
                 }
 
                 case "authorize-ready": {
                     // just relay this to the opener
-                    // if (window.parent) {
-                    //     window.parent.postMessage(message, "*");
-                    // }
-
                     if (window.parent) {
-                        window.parent.postMessage({ kind: "ping" }, "*");
+                        window.parent.postMessage(message, "*");
                     }
 
                     const request: InternetIdentityAuthRequest = {
@@ -372,7 +362,6 @@ export class AuthClient {
                         ),
                         maxTimeToLive: options?.maxTimeToLive,
                     };
-                    this._authRequest = request;
                     console.log("authorize-client", request);
                     this._idpWindow?.postMessage(request, identityProviderUrl.origin);
                     break;
