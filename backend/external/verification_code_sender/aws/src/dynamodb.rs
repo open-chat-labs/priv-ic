@@ -6,7 +6,7 @@ use std::str::FromStr;
 use types::{CanisterId, Error};
 use verification_code_sender::index_store::IndexStore;
 
-const TABLE_NAME: &str = "notification_indexes";
+const TABLE_NAME: &str = "privic_verification_index";
 
 pub struct DynamoDbClient {
     client: Client,
