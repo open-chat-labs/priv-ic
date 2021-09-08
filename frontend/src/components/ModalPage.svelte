@@ -1,4 +1,5 @@
 <script lang="ts">
+    export let fill: boolean = false;
     export let minHeight: string | undefined = undefined;
     export let bgClass:
         | "locked"
@@ -11,7 +12,7 @@
 </script>
 
 <div class={`modal-page ${bgClass}`}>
-    <div class="modal-page-panel" style="min-height: {minHeight}">
+    <div class="modal-page-panel" class:fill style="min-height: {minHeight}">
         <slot />
     </div>
 </div>
@@ -73,6 +74,15 @@
         @include size-below(md) {
             width: 100%;
             margin: 0 $sp4;
+        }
+
+        &.fill {
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            max-width: none;
+            margin: 0;
+            border: none;
         }
     }
 </style>

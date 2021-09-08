@@ -6,7 +6,7 @@
     export let loading: boolean = false;
 </script>
 
-<ModalPage bgClass="underwater">
+<ModalPage fill={window.location.hash === "#authorize"} bgClass="underwater">
     <h4 class="subtitle">Login required ...</h4>
     <h1 class="title">{loading ? "Logging in to PrivIC" : "Login to PrivIC"}</h1>
     <p class="blurb">

@@ -205,7 +205,8 @@ export class AuthClient {
         // The event handler for processing events from the IdP.
         private _eventHandler?: (event: MessageEvent) => void,
         private _authSuccess?: InternetIdentityAuthResponseSuccess,
-        private _authRequest?: InternetIdentityAuthRequest
+        private _authRequest?: InternetIdentityAuthRequest,
+        private _callingOrigin?: string
     ) {}
 
     private _handleSuccess(message: InternetIdentityAuthResponseSuccess, onSuccess?: () => void) {
@@ -276,17 +277,19 @@ export class AuthClient {
     }
 
     private async createDelegation(): Promise<void> {
-        if (this._authRequest) {
+        if (this._authRequest && this._callingOrigin) {
             const client = IdentityClient.create(this._identity);
             const [userKey, ttl] = await client.prepareDelegation(
-                window.parent.origin,
+                this._callingOrigin,
                 this._authRequest?.sessionPublicKey,
                 this._authRequest?.maxTimeToLive
             );
-            const signedDelegation = await client.getDelegation(window.parent.origin, userKey, ttl);
+            console.log("prepared delegation", userKey, ttl);
+            const signedDelegation = await client.getDelegation(this._callingOrigin, userKey, ttl);
             if (signedDelegation === "no_such_delegation") {
                 throw Error("Couldn't create delegation");
             }
+            console.log("got delegation");
 
             const parsed_signed_delegation = {
                 delegation: {
@@ -310,10 +313,16 @@ export class AuthClient {
         if (window.parent) {
             // todo - not restricting the origin here is very dodgy but it doesn't work otherwise
             // not sure why
-            await this.createDelegation();
-            if (this._authSuccess) {
-                window.parent.postMessage(this._authSuccess, "*");
+            try {
+                await this.createDelegation();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (err: any) {
+                console.log("delegation error", err);
             }
+            console.log("success: ", this._authSuccess);
+            // if (this._authSuccess) {
+            //     window.parent.postMessage(this._authSuccess, "*");
+            // }
         }
     }
 
@@ -325,7 +334,8 @@ export class AuthClient {
 
             const message = event.data as
                 | IdentityServiceResponseMessage
-                | InternetIdentityAuthRequest;
+                | InternetIdentityAuthRequest
+                | { kind: "pong"; origin: string };
 
             console.log("received message in privIC: ", message);
 
@@ -335,15 +345,36 @@ export class AuthClient {
                     // and maxTTL that we will need later to create a delegation
                     // so we need to tuck that away
                     this._authRequest = message;
+                    console.log("shouldn't see this now", message);
                     this._idpWindow?.postMessage(message, identityProviderUrl.origin);
+                    break;
+                }
+
+                case "pong": {
+                    this._callingOrigin = message.origin;
                     break;
                 }
 
                 case "authorize-ready": {
                     // just relay this to the opener
+                    // if (window.parent) {
+                    //     window.parent.postMessage(message, "*");
+                    // }
+
                     if (window.parent) {
-                        window.parent.postMessage(message, "*");
+                        window.parent.postMessage({ kind: "ping" }, "*");
                     }
+
+                    const request: InternetIdentityAuthRequest = {
+                        kind: "authorize-client",
+                        sessionPublicKey: new Uint8Array(
+                            this._key?.getPublicKey().toDer() as ArrayBuffer
+                        ),
+                        maxTimeToLive: options?.maxTimeToLive,
+                    };
+                    this._authRequest = request;
+                    console.log("authorize-client", request);
+                    this._idpWindow?.postMessage(request, identityProviderUrl.origin);
                     break;
                 }
                 case "authorize-client-success":

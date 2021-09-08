@@ -45,6 +45,7 @@
     let visibleAttributes: bigint[] = [];
     let requirementsMet: boolean = dataRequest === undefined ? true : false;
     let requirements: Requirement[] = [];
+    let returned: boolean = false;
 
     type Requirement = {
         message: string;
@@ -55,10 +56,14 @@
 
     $: {
         requirements = evaluateRequirements(visibleAttributes, profile, dataRequest);
-        requirementsMet = !requirements.some((r) => !r.met);
+        requirementsMet = profile !== undefined && !requirements.some((r) => !r.met);
 
-        if (requirementsMet) {
-            returnToClient();
+        if (requirementsMet && !returned) {
+            returned = true;
+            returnToClient().catch((err) => {
+                returned = false;
+                throw err;
+            });
         }
     }
 

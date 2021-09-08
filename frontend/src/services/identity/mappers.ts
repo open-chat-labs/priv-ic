@@ -115,6 +115,7 @@ export function sendCodeResponse(candid: ApiSendVerificationCodeResponse): SendC
 }
 
 export function delegationResponse(candid: ApiDelegationResponse): DelegationResponse {
+    console.log("delegation response: ", candid);
     if ("no_such_delegation" in candid) {
         return "no_such_delegation";
     }
