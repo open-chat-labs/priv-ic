@@ -271,7 +271,7 @@
 
                 <p class="blurb">
                     All of your personal information in one place. You are in control of exactly
-                    which personal information your favourite dApps have access to. See at a glance
+                    which personal information your favourite Dapps have access to. See at a glance
                     who is using what and revoke access at any time.
                 </p>
             </div>
