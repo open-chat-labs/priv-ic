@@ -409,14 +409,15 @@
 
     .wrapper {
         display: flex;
-        @include fullScreenImg("../assets/underwater.jpg");
+        @include fullScreenImg("../assets/quiet.jpg");
+        background-position: 500px;
     }
 
     .main {
         display: flex;
         flex-direction: column;
-        flex: 0 0 900px;
-        max-width: 900px;
+        flex: 0 0 800px;
+        max-width: 800px;
         padding: 20px 50px 50px 50px;
         @include fullHeight();
         margin: auto;
