@@ -281,16 +281,17 @@ export class AuthClient {
             const client = IdentityClient.create(this._identity);
             const [userKey, ttl] = await client.prepareDelegation(
                 this._callingOrigin,
-                this._authRequest?.sessionPublicKey,
-                this._authRequest?.maxTimeToLive
+                this._authRequest.sessionPublicKey,
+                this._authRequest.maxTimeToLive
             );
-            console.log("prepared delegation", userKey, ttl);
-            const signedDelegation = await client.getDelegation(this._callingOrigin, userKey, ttl);
+            const signedDelegation = await client.getDelegation(
+                this._callingOrigin,
+                this._authRequest.sessionPublicKey,
+                ttl
+            );
             if (signedDelegation === "no_such_delegation") {
                 throw Error("Couldn't create delegation");
             }
-            console.log("got delegation");
-
             const parsed_signed_delegation = {
                 delegation: {
                     pubkey: Uint8Array.from(signedDelegation.delegation.pubkey),
@@ -319,10 +320,9 @@ export class AuthClient {
             } catch (err: any) {
                 console.log("delegation error", err);
             }
-            console.log("success: ", this._authSuccess);
-            // if (this._authSuccess) {
-            //     window.parent.postMessage(this._authSuccess, "*");
-            // }
+            if (this._authSuccess) {
+                window.parent.postMessage(this._authSuccess, "*");
+            }
         }
     }
 

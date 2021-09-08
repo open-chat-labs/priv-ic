@@ -18,6 +18,7 @@
 
     import CheckCircleOutline from "svelte-material-icons/CheckCircleOutline.svelte";
     import CloseCircleOutline from "svelte-material-icons/CloseCircleOutline.svelte";
+    import Refresh from "svelte-material-icons/Refresh.svelte";
     import type { ServiceContainer } from "../services/serviceContainer";
     import Loading from "./Loading.svelte";
     import NewPhoneNumber from "./NewPhoneNumber.svelte";
@@ -31,13 +32,6 @@
 
     export let serviceContainer: ServiceContainer;
     export let dataRequest: DataRequest | undefined = undefined;
-    // export let dataRequest: DataRequest | undefined = {
-    //     from: "openchat",
-    //     requirements: {
-    //         phone: "full-access",
-    //         email: "exists",
-    //     },
-    // };
     let profile: Profile | undefined;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
@@ -45,7 +39,7 @@
     let visibleAttributes: bigint[] = [];
     let requirementsMet: boolean = dataRequest === undefined ? true : false;
     let requirements: Requirement[] = [];
-    let returned: boolean = false;
+    let returning: boolean = false;
 
     type Requirement = {
         message: string;
@@ -58,10 +52,10 @@
         requirements = evaluateRequirements(visibleAttributes, profile, dataRequest);
         requirementsMet = profile !== undefined && !requirements.some((r) => !r.met);
 
-        if (requirementsMet && !returned) {
-            returned = true;
+        if (requirementsMet && !returning) {
+            returning = true;
             returnToClient().catch((err) => {
-                returned = false;
+                returning = false;
                 throw err;
             });
         }
@@ -268,6 +262,17 @@
                                     <div class="msg">{req.message}</div>
                                 </div>
                             {/each}
+
+                            {#if returning}
+                                <div class="requirement all-met">
+                                    <div class="met">
+                                        <Refresh size={"1.5em"} color={"hotpink"} />
+                                    </div>
+                                    <div class="msg">
+                                        Requirements met - wait while we return you to OpenChat
+                                    </div>
+                                </div>
+                            {/if}
                         </div>
                     </section>
                 {/if}
@@ -371,6 +376,10 @@
 </div>
 
 <style type="text/scss">
+    :global(.requirement.all-met .met svg) {
+        @include spin();
+    }
+
     .wrapper {
         display: flex;
         @include fullScreenImg("../assets/underwater.jpg");
@@ -467,6 +476,10 @@
         }
         .msg {
             flex: auto;
+        }
+
+        &.all-met {
+            margin-top: $sp4;
         }
     }
 </style>
