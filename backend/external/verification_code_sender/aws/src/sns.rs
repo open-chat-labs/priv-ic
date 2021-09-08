@@ -28,9 +28,9 @@ impl SmsSender for SnsClient {
         self.client
             .publish()
             .phone_number(phone_number)
-            .subject("privIC")
+            .subject("PrivIC Verification Code")
             .message(format!(
-                "Your privIC phone number verification code is {} and will expire in 1 hour",
+                "Your PrivIC phone number verification code is {} and will expire in 1 hour",
                 code
             ))
             .send()

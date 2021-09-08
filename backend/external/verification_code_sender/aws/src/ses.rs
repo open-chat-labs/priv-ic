@@ -29,12 +29,12 @@ impl EmailSender for SesClient {
             .build();
 
         let title_content = Content::builder()
-            .data("privIC email address verification")
+            .data("PrivIC email address verification")
             .build();
 
         let body_content = Content::builder()
             .data(format!(
-                "Your privIC email address verification code is {} and will expire in 1 hour",
+                "Your PrivIC email address verification code is {} and will expire in 1 hour",
                 code
             ))
             .build();
@@ -46,7 +46,7 @@ impl EmailSender for SesClient {
 
         self.client
             .send_email()
-            .source("verification@privic.com")
+            .source("verification@privic.app")
             .destination(destination)
             .message(message)
             .send()
