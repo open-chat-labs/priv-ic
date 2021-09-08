@@ -31,11 +31,10 @@ impl SmsSender for SnsClient {
     async fn send(&self, phone_number: String, code: String) -> Result<(), Error> {
         self.client
             .publish()
-            .set_topic_arn(Some(self.sms_topic_arn.clone()))
             .phone_number(phone_number)
-            .subject("privIC")
+            .subject("PrivIC Verification Code")
             .message(format!(
-                "Your privIC phone number verification code is {} and will expire in 1 hour",
+                "Your PrivIC phone number verification code is {} and will expire in 1 hour",
                 code
             ))
             .send()
