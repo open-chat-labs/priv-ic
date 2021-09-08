@@ -204,7 +204,6 @@ export class AuthClient {
         private _idpWindow?: Window,
         // The event handler for processing events from the IdP.
         private _eventHandler?: (event: MessageEvent) => void,
-        private _authSuccess?: InternetIdentityAuthResponseSuccess,
         private _authRequest?: InternetIdentityAuthRequest,
         private _callingOrigin?: string
     ) {}
@@ -276,7 +275,7 @@ export class AuthClient {
         this._idpWindow = window.open(identityProviderUrl.toString(), "idpWindow") ?? undefined;
     }
 
-    private async createDelegation(): Promise<void> {
+    private async createDelegation(): Promise<InternetIdentityAuthResponseSuccess | undefined> {
         if (this._authRequest && this._callingOrigin) {
             const client = IdentityClient.create(this._identity);
             const [userKey, ttl] = await client.prepareDelegation(
@@ -302,7 +301,7 @@ export class AuthClient {
             };
 
             // todo do we need to add this to the list of delegations rather than just creating a new list
-            this._authSuccess = {
+            return {
                 kind: "authorize-client-success",
                 delegations: [parsed_signed_delegation],
                 userPublicKey: Uint8Array.from(userKey),
@@ -313,13 +312,13 @@ export class AuthClient {
     public async returnToClientApp(): Promise<void> {
         if (window.parent) {
             try {
-                await this.createDelegation();
+                const resp = await this.createDelegation();
+                if (resp && this._callingOrigin) {
+                    window.parent.postMessage(resp, this._callingOrigin);
+                }
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 console.log("delegation error", err);
-            }
-            if (this._authSuccess && this._callingOrigin) {
-                window.parent.postMessage(this._authSuccess, this._callingOrigin);
             }
         }
     }
@@ -343,9 +342,6 @@ export class AuthClient {
                     // so we need to tuck that away, but not send it to II
                     this._authRequest = message;
                     this._callingOrigin = event.origin;
-                    console.log(event.origin);
-                    console.log("auth request from open chat", message);
-                    // this._idpWindow?.postMessage(message, identityProviderUrl.origin);
                     break;
                 }
 
@@ -414,7 +410,6 @@ export class AuthClient {
         this._identity = new AnonymousIdentity();
         this._key = null;
         this._chain = null;
-        this._authSuccess = undefined;
         this._authRequest = undefined;
 
         if (options.returnTo) {
