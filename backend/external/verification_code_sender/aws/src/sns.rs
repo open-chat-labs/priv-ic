@@ -6,7 +6,6 @@ use verification_code_sender::sms_sender::SmsSender;
 
 pub struct SnsClient {
     client: Client,
-    sms_topic_arn: String,
 }
 
 impl SnsClient {
@@ -15,13 +14,10 @@ impl SnsClient {
 
         let client = Client::from_conf(config);
 
-        let sms_topic_arn = dotenv::var("SMS_TOPIC_ARN")?;
-
         info!("SnsClient created");
 
         Ok(SnsClient {
             client,
-            sms_topic_arn,
         })
     }
 }
@@ -31,7 +27,6 @@ impl SmsSender for SnsClient {
     async fn send(&self, phone_number: String, code: String) -> Result<(), Error> {
         self.client
             .publish()
-            .set_topic_arn(Some(self.sms_topic_arn.clone()))
             .phone_number(phone_number)
             .subject("privIC")
             .message(format!(
