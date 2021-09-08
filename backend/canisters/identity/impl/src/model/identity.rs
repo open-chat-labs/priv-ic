@@ -69,7 +69,7 @@ impl Attribute {
                 let number = format!("{} {}", va.value.country_code, va.value.number);
                 VerificationCodeTarget::Phone(number)
             }
-            Attribute::EmailAddress(va) => VerificationCodeTarget::Phone(va.value.clone()),
+            Attribute::EmailAddress(va) => VerificationCodeTarget::Email(va.value.clone()),
         }
     }
 }
