@@ -1,13 +1,13 @@
 import { AnonymousIdentity, Identity, SignIdentity } from "@dfinity/agent";
-import { isDelegationValid } from "@dfinity/authentication";
 import { blobFromUint8Array, derBlobFromBlob } from "@dfinity/candid";
+import type { Principal } from "@dfinity/principal";
+import { isDelegationValid } from "@dfinity/authentication";
 import {
     Delegation,
     DelegationChain,
     DelegationIdentity,
     Ed25519KeyIdentity,
 } from "@dfinity/identity";
-import type { Principal } from "@dfinity/principal";
 import { IdentityClient } from "../services/identity/identity.client";
 
 const KEY_LOCALSTORAGE_KEY = "identity";
@@ -208,10 +208,7 @@ export class AuthClient {
         private _authRequest?: InternetIdentityAuthRequest
     ) {}
 
-    private _handleSuccess(
-        message: InternetIdentityAuthResponseSuccess,
-        onSuccess?: () => void
-    ): void {
+    private _handleSuccess(message: InternetIdentityAuthResponseSuccess, onSuccess?: () => void) {
         const delegations = message.delegations.map((signedDelegation) => {
             return {
                 delegation: new Delegation(
@@ -230,11 +227,10 @@ export class AuthClient {
 
         const key = this._key;
         if (!key) {
-            throw new Error("no key");
+            return;
         }
 
         this._chain = delegationChain;
-
         this._identity = DelegationIdentity.fromDelegation(key, this._chain);
 
         this._idpWindow?.close();
@@ -323,7 +319,6 @@ export class AuthClient {
 
     private _getEventHandler(identityProviderUrl: URL, options?: AuthClientLoginOptions) {
         return async (event: MessageEvent) => {
-            // todo - we need to restrict this but how?
             // if (event.origin !== identityProviderUrl.origin) {
             //     return;
             // }
@@ -333,6 +328,7 @@ export class AuthClient {
                 | InternetIdentityAuthRequest;
 
             console.log("received message in privIC: ", message);
+
             switch (message.kind) {
                 case "authorize-client": {
                     // this comes from the calling system and contains the sessionPublicKey
@@ -342,6 +338,7 @@ export class AuthClient {
                     this._idpWindow?.postMessage(message, identityProviderUrl.origin);
                     break;
                 }
+
                 case "authorize-ready": {
                     // just relay this to the opener
                     if (window.parent) {
@@ -350,11 +347,13 @@ export class AuthClient {
                     break;
                 }
                 case "authorize-client-success":
-                    // relay success back to the caller
                     // Create the delegation chain and store it.
                     try {
                         this._handleSuccess(message, options?.onSuccess);
 
+                        // Setting the storage is moved out of _handleSuccess to make
+                        // it a sync function. Having _handleSuccess as an async function
+                        // messes up the jest tests for some reason.
                         if (this._chain) {
                             await this._storage.set(
                                 KEY_LOCALSTORAGE_DELEGATION,
@@ -396,6 +395,7 @@ export class AuthClient {
         this._key = null;
         this._chain = null;
         this._authSuccess = undefined;
+        this._authRequest = undefined;
 
         if (options.returnTo) {
             try {

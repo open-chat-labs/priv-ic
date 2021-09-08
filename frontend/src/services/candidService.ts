@@ -21,7 +21,8 @@ export abstract class CandidService {
         let response: From;
         try {
             response = await service;
-        } catch (e) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (e: any) {
             console.log(e);
             throw toHttpError(e);
         }
