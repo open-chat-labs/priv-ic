@@ -15,5 +15,5 @@ identity_canister_api = { path = "../../../canisters/identity/api" }
 log = "0.4.14"
 openssl = { version = "0.10.35", features = ["vendored"] }
 serde = "1.0.130"
-tokio = { version = "1.11.0", features = ["macros", "time"] }
+tokio = "1.11.0"
 types = { path = "../../../libraries/types" }
