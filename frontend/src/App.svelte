@@ -3,21 +3,19 @@
     import Loading from "./components/Loading.svelte";
     import Login from "./components/Login.svelte";
     import Profile from "./components/Profile.svelte";
-    import type { DataRequest } from "./domain/requirements/requirements";
-    import { extractDataRequest } from "./domain/requirements/requirements";
     import { getIdentity, login } from "./services/auth";
     import { ServiceContainer } from "./services/serviceContainer";
+    import type { DataRequestWithOrigin } from "./utils/authClient";
 
     let loginRequired: boolean = false;
     let loginInProgress: boolean = false;
     let serviceContainer: ServiceContainer | undefined = undefined;
-    let dataRequest: DataRequest | undefined = undefined;
+    let dataRequest: DataRequestWithOrigin | undefined = undefined;
 
     onMount(() => {
         // if we have #authorize in the hash fragment and we are not signed in, go straight to
         // II
         if (window.location.hash === "#authorize") {
-            dataRequest = extractDataRequest();
             console.log("about to login");
             startLogin();
             loginRequired = true;
@@ -45,8 +43,9 @@
 
     function startLogin() {
         loginInProgress = true;
-        login().then((id) => {
+        login().then(([id, dataReq]) => {
             loginInProgress = loginRequired = false;
+            dataRequest = dataReq;
             serviceContainer = new ServiceContainer(id);
         });
     }

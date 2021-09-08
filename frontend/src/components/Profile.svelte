@@ -25,13 +25,13 @@
     import ClientApp from "./ClientApp.svelte";
     import NewEmailAddress from "./NewEmailAddress.svelte";
     import RegisteredAttribute from "./RegisteredAttribute.svelte";
-    import type { DataRequest, DataRequirement } from "../domain/requirements/requirements";
     import { returnToClient } from "../services/auth";
     import Link from "./Link.svelte";
     import { UnsupportedValueError } from "../utils/error";
+    import type { DataRequestWithOrigin, DataRequirement, DataResponse } from "../utils/authClient";
 
     export let serviceContainer: ServiceContainer;
-    export let dataRequest: DataRequest | undefined = undefined;
+    export let dataRequest: DataRequestWithOrigin | undefined = undefined;
     let profile: Profile | undefined;
     let addingPhoneNumber: boolean = false;
     let addingEmail: boolean = false;
@@ -40,6 +40,7 @@
     let requirementsMet: boolean = dataRequest === undefined ? true : false;
     let requirements: Requirement[] = [];
     let returning: boolean = false;
+    let dataResponse: DataResponse = {};
 
     type Requirement = {
         message: string;
@@ -54,7 +55,7 @@
 
         if (requirementsMet && !returning) {
             returning = true;
-            returnToClient().catch((err) => {
+            returnToClient(dataResponse ?? {}).catch((err) => {
                 returning = false;
                 throw err;
             });
@@ -64,43 +65,69 @@
     function evaluateRequirements(
         visibleAttributes: bigint[],
         profile: Profile | undefined,
-        dataRequest: DataRequest | undefined
+        dataRequest: DataRequestWithOrigin | undefined
     ): Requirement[] {
         if (dataRequest === undefined) return [];
         if (profile === undefined) return [];
 
         const requirements = [];
 
-        if (dataRequest.requirements.phone !== undefined) {
+        if (dataRequest.phone !== undefined) {
+            const message = requirementStringPerRequirement(
+                "phone number",
+                dataRequest.origin,
+                dataRequest.phone
+            );
+
+            const phone =
+                dataRequest.phone === "exists"
+                    ? profile.identity.phone.numbers.find((n) => n.status === "verified")
+                    : profile.identity.phone.numbers.find(
+                          (n) => n.status === "verified" && visibleAttributes.includes(n.id)
+                      );
+
             requirements.push({
-                message: requirementStringPerRequirement(
-                    "phone number",
-                    dataRequest.from,
-                    dataRequest.requirements.phone
-                ),
-                met:
-                    dataRequest.requirements.phone === "exists"
-                        ? profile.identity.phone.numbers.some((n) => n.status === "verified")
-                        : profile.identity.phone.numbers.some(
-                              (n) => n.status === "verified" && visibleAttributes.includes(n.id)
-                          ),
+                message,
+                met: phone !== undefined,
             });
+
+            dataResponse.phone =
+                dataRequest.phone === "exists"
+                    ? phone !== undefined
+                        ? "exists"
+                        : undefined
+                    : phone !== undefined
+                    ? phone.value
+                    : undefined;
         }
 
-        if (dataRequest.requirements.email !== undefined) {
+        if (dataRequest.email !== undefined) {
+            const message = requirementStringPerRequirement(
+                "email address",
+                dataRequest.origin,
+                dataRequest.email
+            );
+
+            const email =
+                dataRequest.email === "exists"
+                    ? profile.identity.email.addresses.find((n) => n.status === "verified")
+                    : profile.identity.email.addresses.find(
+                          (n) => n.status === "verified" && visibleAttributes.includes(n.id)
+                      );
+
             requirements.push({
-                message: requirementStringPerRequirement(
-                    "email address",
-                    dataRequest.from,
-                    dataRequest.requirements.email
-                ),
-                met:
-                    dataRequest.requirements.email === "exists"
-                        ? profile.identity.email.addresses.some((n) => n.status === "verified")
-                        : profile.identity.email.addresses.some(
-                              (n) => n.status === "verified" && visibleAttributes.includes(n.id)
-                          ),
+                message,
+                met: email !== undefined,
             });
+
+            dataResponse.email =
+                dataRequest.phone === "exists"
+                    ? email !== undefined
+                        ? "exists"
+                        : undefined
+                    : email !== undefined
+                    ? email.value
+                    : undefined;
         }
 
         return requirements;
@@ -295,7 +322,7 @@
                         </div>
                     </section>
                 {/if}
-                {#if dataRequest === undefined || dataRequest?.requirements.phone !== undefined}
+                {#if dataRequest === undefined || dataRequest?.phone !== undefined}
                     <section class="section">
                         <div class="section-header">
                             <h5 class="section-title">Phone numbers</h5>
@@ -333,7 +360,7 @@
                         </div>
                     </section>
                 {/if}
-                {#if dataRequest === undefined || dataRequest?.requirements.email !== undefined}
+                {#if dataRequest === undefined || dataRequest?.email !== undefined}
                     <section class="section">
                         <div class="section-header">
                             <h5 class="section-title">Email addresses</h5>

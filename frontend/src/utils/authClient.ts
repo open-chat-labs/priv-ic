@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { AnonymousIdentity, Identity, SignIdentity } from "@dfinity/agent";
 import { blobFromUint8Array, derBlobFromBlob } from "@dfinity/candid";
 import type { Principal } from "@dfinity/principal";
@@ -14,6 +15,27 @@ const KEY_LOCALSTORAGE_KEY = "identity";
 const KEY_LOCALSTORAGE_DELEGATION = "delegation";
 const IDENTITY_PROVIDER_DEFAULT = "https://identity.ic0.app";
 const IDENTITY_PROVIDER_ENDPOINT = "#authorize";
+
+export type PhoneNumber = {
+    countryCode: number;
+    number: string;
+};
+
+export type DataRequirement = "exists" | "full-access";
+
+export type DataRequirementResponse<T> = "exists" | T;
+
+export type DataRequest = {
+    email?: DataRequirement;
+    phone?: DataRequirement;
+};
+
+export type DataRequestWithOrigin = DataRequest & { origin: string };
+
+export type DataResponse = {
+    email?: DataRequirementResponse<string>;
+    phone?: DataRequirementResponse<PhoneNumber>;
+};
 
 /**
  * List of options for creating an {@link AuthClient}.
@@ -41,7 +63,7 @@ export interface AuthClientLoginOptions {
     /**
      * Callback once login has completed
      */
-    onSuccess?: () => void;
+    onSuccess?: (dataRequest: DataRequestWithOrigin | undefined) => void;
     /**
      * Callback in case authentication fails
      */
@@ -63,6 +85,7 @@ interface InternetIdentityAuthRequest {
     kind: "authorize-client";
     sessionPublicKey: Uint8Array;
     maxTimeToLive?: bigint;
+    dataRequest: DataRequest;
 }
 
 interface InternetIdentityAuthResponseSuccess {
@@ -76,6 +99,7 @@ interface InternetIdentityAuthResponseSuccess {
         signature: Uint8Array;
     }[];
     userPublicKey: Uint8Array;
+    dataResponse: DataResponse;
 }
 
 async function _deleteStorage(storage: AuthClientStorage) {
@@ -137,6 +161,7 @@ interface AuthResponseSuccess {
         signature: Uint8Array;
     }[];
     userPublicKey: Uint8Array;
+    dataResponse: DataResponse;
 }
 
 interface AuthResponseFailure {
@@ -148,6 +173,8 @@ type IdentityServiceResponseMessage = AuthReadyMessage | AuthResponse;
 type AuthResponse = AuthResponseSuccess | AuthResponseFailure;
 
 export class AuthClient {
+    public kind = "middleman";
+
     public static async create(options: AuthClientCreateOptions = {}): Promise<AuthClient> {
         const storage = options.storage ?? new LocalStorage("ic-");
 
@@ -208,7 +235,10 @@ export class AuthClient {
         private _callingOrigin?: string
     ) {}
 
-    private _handleSuccess(message: InternetIdentityAuthResponseSuccess, onSuccess?: () => void) {
+    private _handleSuccess(
+        message: InternetIdentityAuthResponseSuccess,
+        onSuccess?: (dataRequest: DataRequestWithOrigin | undefined) => void
+    ) {
         const delegations = message.delegations.map((signedDelegation) => {
             return {
                 delegation: new Delegation(
@@ -234,7 +264,14 @@ export class AuthClient {
         this._identity = DelegationIdentity.fromDelegation(key, this._chain);
 
         this._idpWindow?.close();
-        onSuccess?.();
+        onSuccess?.(
+            this._authRequest
+                ? {
+                      ...this._authRequest.dataRequest,
+                      origin: this._callingOrigin!,
+                  }
+                : undefined
+        );
         this._removeEventListener();
     }
 
@@ -275,7 +312,9 @@ export class AuthClient {
         this._idpWindow = window.open(identityProviderUrl.toString(), "idpWindow") ?? undefined;
     }
 
-    private async createDelegation(): Promise<InternetIdentityAuthResponseSuccess | undefined> {
+    private async createDelegation(
+        dataResponse: DataResponse
+    ): Promise<InternetIdentityAuthResponseSuccess | undefined> {
         if (this._authRequest && this._callingOrigin) {
             const client = IdentityClient.create(this._identity);
             const [userKey, ttl] = await client.prepareDelegation(
@@ -305,14 +344,15 @@ export class AuthClient {
                 kind: "authorize-client-success",
                 delegations: [parsed_signed_delegation],
                 userPublicKey: Uint8Array.from(userKey),
+                dataResponse,
             };
         }
     }
 
-    public async returnToClientApp(): Promise<void> {
-        if (window.parent) {
+    public async returnToClientApp(dataResponse: DataResponse): Promise<void> {
+        if (window.location.hash === "#authorize" && window.parent) {
             try {
-                const resp = await this.createDelegation();
+                const resp = await this.createDelegation(dataResponse);
                 if (resp && this._callingOrigin) {
                     window.parent.postMessage(resp, this._callingOrigin);
                 }
@@ -340,6 +380,7 @@ export class AuthClient {
                     // this comes from the calling system and contains the sessionPublicKey
                     // and maxTTL that we will need later to create a delegation
                     // so we need to tuck that away, but not send it to II
+                    console.log("where is this coming from", event.origin);
                     this._authRequest = message;
                     this._callingOrigin = event.origin;
                     break;
@@ -347,7 +388,7 @@ export class AuthClient {
 
                 case "authorize-ready": {
                     // just relay this to the opener
-                    if (window.parent) {
+                    if (window.location.hash === "#authorize" && window.parent) {
                         window.parent.postMessage(message, "*");
                     }
 
@@ -357,6 +398,7 @@ export class AuthClient {
                             this._key?.getPublicKey().toDer() as ArrayBuffer
                         ),
                         maxTimeToLive: options?.maxTimeToLive,
+                        dataRequest: {}, // this is not relevant for II
                     };
                     console.log("authorize-client", request);
                     this._idpWindow?.postMessage(request, identityProviderUrl.origin);

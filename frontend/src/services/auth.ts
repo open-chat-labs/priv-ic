@@ -1,16 +1,13 @@
 import type { Identity } from "@dfinity/agent";
-import { AuthClient as Middleman } from "../utils/authClient";
-import { AuthClient } from "@dfinity/auth-client";
+import { AuthClient as Middleman, DataRequestWithOrigin, DataResponse } from "../utils/authClient";
 import { DelegationIdentity } from "@dfinity/identity";
-import { extractDataRequest } from "../domain/requirements/requirements";
 
 const ONE_MINUTE_MILLIS = 60 * 1000;
 
 // Use your local .env file to direct this to the local IC replica
 const IDENTITY_URL = process.env.INTERNET_IDENTITY_URL || "https://identity.ic0.app";
 
-const dataRequest = extractDataRequest();
-const authClient = dataRequest ? Middleman.create() : AuthClient.create();
+const authClient = Middleman.create();
 
 export function getIdentity(): Promise<Identity> {
     return authClient.then((c) => {
@@ -23,22 +20,21 @@ export function isAuthenticated(): Promise<boolean> {
     return authClient.then((c) => c.isAuthenticated());
 }
 
-export function returnToClient(): Promise<void> {
+export function returnToClient(dataResponse: DataResponse): Promise<void> {
     return authClient.then((c) => {
-        if ("returnToClientApp" in c) {
-            c.returnToClientApp();
-        }
+        c.returnToClientApp(dataResponse);
     });
 }
 
-export function login(): Promise<Identity> {
+export function login(): Promise<[Identity, DataRequestWithOrigin | undefined]> {
     return authClient.then((c) => {
         return new Promise((resolve, reject) => {
             c.login({
                 identityProvider: IDENTITY_URL,
-                onSuccess: () => {
+                onSuccess: (dataRequest: DataRequestWithOrigin | undefined) => {
+                    console.log("Data request from open chat", dataRequest);
                     console.log("PrivIC Principal", c.getIdentity().getPrincipal().toText());
-                    resolve(c.getIdentity());
+                    resolve([c.getIdentity(), dataRequest]);
                 },
                 onError: (err) => reject(err),
             });
